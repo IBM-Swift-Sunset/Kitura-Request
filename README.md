@@ -1,2 +1,4 @@
 # Kitura-Request
-Send HTTP requests from Kitura
+> :construction: Work In Progress
+
+This repository is incomplete and under active development. Do not use - yet!
