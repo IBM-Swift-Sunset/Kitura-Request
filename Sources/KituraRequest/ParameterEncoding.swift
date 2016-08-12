@@ -35,13 +35,13 @@ public enum ParameterEncoding {
     
     switch self {
     case .URL:
-      guard let components = NSURLComponents.safeInit(URL: request.url!, resolvingAgainstBaseURL: false) else {
+      guard let components = NSURLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
         throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
       }
       
       components.query = getQueryComponents(fromDictionary: parameters)
       
-      guard let newURL = components.safeGetURL() else {
+      guard let newURL = components.url else {
         throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
       }
       request.url = newURL

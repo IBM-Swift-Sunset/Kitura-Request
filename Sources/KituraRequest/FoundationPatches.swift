@@ -18,39 +18,39 @@ import Foundation
 
 // Patches to fix missing features of Swift Foundation
 
-extension NSMutableURLRequest {
-  #if os(Linux)
-  private struct addedProperties {
-    static var httpBody: NSData?
-  }
-  var httpBody: NSData? {
-    get {
-      return addedProperties.httpBody
-    }
-    set {
-      addedProperties.httpBody = newValue
-    }
-  }
-  #endif
-}
-
-extension NSURLComponents {
-  class func safeInit(URL url: URL, resolvingAgainstBaseURL resolve: Bool) -> NSURLComponents? {
-    #if os(Linux)
-      return NSURLComponents(URL: url, resolvingAgainstBaseURL: resolve)
-    #else
-      return NSURLComponents(url: url, resolvingAgainstBaseURL: resolve)
-    #endif
-  }
-  
-  func safeGetURL() -> URL? {
-    #if os(Linux)
-      return self.URL
-    #else
-      return self.url
-    #endif
-  }
-}
+//extension NSMutableURLRequest {
+//  #if os(Linux)
+//  private struct addedProperties {
+//    static var httpBody: NSData?
+//  }
+//  var httpBody: NSData? {
+//    get {
+//      return addedProperties.httpBody
+//    }
+//    set {
+//      addedProperties.httpBody = newValue
+//    }
+//  }
+//  #endif
+//}
+//
+//extension NSURLComponents {
+//  class func safeInit(URL url: URL, resolvingAgainstBaseURL resolve: Bool) -> NSURLComponents? {
+//    #if os(Linux)
+//      return NSURLComponents(URL: url, resolvingAgainstBaseURL: resolve)
+//    #else
+//      return NSURLComponents(url: url, resolvingAgainstBaseURL: resolve)
+//    #endif
+//  }
+//  
+//  func safeGetURL() -> URL? {
+//    #if os(Linux)
+//      return self.URL
+//    #else
+//      return self.url
+//    #endif
+//  }
+//}
 
 #if os(Linux)
   func convertValuesToAnyObject(_ d: [String: Any]?) -> [String: AnyObject]? {

@@ -30,7 +30,7 @@ public class Request {
   var data: NSData?
   var error: Swift.Error?
   
-  public typealias ResponseArguments = (request: ClientRequest?, response: ClientResponse?, data: NSData?, error:Swift.Error?)
+  public typealias ResponseArguments = (request: ClientRequest?, response: ClientResponse?, data: Data?, error:Swift.Error?)
   public typealias CompletionHandler = (ResponseArguments) -> Void
   
   public init(method: RequestMethod,
@@ -52,7 +52,14 @@ public class Request {
       var urlRequest = try formatURL(URL)
     
       try encoding.encode(&urlRequest, parameters: parameters)
-      options.append(.hostname(urlRequest.url!.absoluteString)) // safe to force unwrap here
+    
+      // HACK: find a proper solution
+      #if os(Linux)
+      options.append(.hostname(urlRequest.url!.absoluteString!))
+      #else
+      options.append(.hostname(urlRequest.url!.absoluteString))
+      #endif
+      
       
       // Create request
       let request = HTTP.request(options) {
