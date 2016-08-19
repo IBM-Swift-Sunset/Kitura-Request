@@ -32,24 +32,73 @@ public struct BodyBoundary {
 public struct BodyPart {
 
     public enum MimeType {
+
+        public enum Image: String {
+            case png = "png"
+            case jpeg = "jpeg"
+        }
+
         case none
+        // case text
+        case image(type: Image)
+
+        var value: String? {
+            switch self {
+            case .image(let type):
+                return "image/\(type.rawValue)"
+            default:
+                break
+            }
+            return nil
+        }
     }
 
     private(set) var data: Data
     private(set) var mimeType: MimeType
     private(set) var fileName: String?
 
-    public init(data: Data, mimeType: MimeType? = nil, fileName: String? = nil) {
+    public init?(_ object: AnyObject) {
+        let string = String(object)
+        guard let data = string.data(using: .utf8, allowLossyConversion: false) else {
+            return nil
+        }
+
         self.data = data
-        self.mimeType = mimeType ?? .none
+        self.mimeType = .none
+    }
+
+    public init(data: Data, mimeType: MimeType = .none, fileName: String? = nil) {
+        self.data = data
+        self.mimeType = mimeType
         self.fileName = fileName
     }
 
-    private var header: String {
-        return ""
+    private func header(for key: String) -> String {
+        var header = "Content-Disposition: form-data; name=\(key)"
+
+        if let fileName = self.fileName {
+            header += "; filename=\(fileName)"
+        }
+
+        if let mimeType = self.mimeType.value {
+            header += "\(String.newLine)Content-Type: \(mimeType)"
+        }
+
+        header += "\(String.newLine)\(String.newLine)"
+
+        return header
     }
 
-    public func content(for key: String) -> Data {
-        return Data()
+    public func content(for key: String) throws -> Data {
+        var result = Data()
+        let headerString = self.header(for: key)
+        guard let header = headerString.data(using: .utf8, allowLossyConversion: false) else {
+            throw ParameterEncodingError.CouldNotCreateMultipart
+        }
+
+        result.append(header)
+        result.append(self.data)
+
+        return result
     }
 }

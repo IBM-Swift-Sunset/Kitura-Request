@@ -84,9 +84,22 @@ public enum ParameterEncoding {
         let boundary = BodyBoundary(boundaryString)
 
         let parameters = self.getComponents(from: parameters)
+
+        var bodyParameters = parameters.body
+
+        bodyParameters += parameters.query.flatMap { item in
+            let key = item.0
+            let value = item.1
+
+            guard let returnValue = BodyPart(value) else {
+                return nil
+            }
+            return (key, returnValue)
+        }
+
         var httpBody = Data()
 
-        for (index, bodyPart) in parameters.body.enumerated() {
+        for (index, bodyPart) in bodyParameters.enumerated() {
             let bodyBoundary: Data
 
             if index == 0,
@@ -101,7 +114,8 @@ public enum ParameterEncoding {
 
             httpBody.append(bodyBoundary)
 
-            httpBody.append(bodyPart.part.content(for: bodyPart.key))
+            let parameterBody = try bodyPart.part.content(for: bodyPart.key)
+            httpBody.append(parameterBody)
         }
 
         guard let final = boundary.final else {
