@@ -64,7 +64,7 @@ public enum ParameterEncoding {
         let options = JSONSerialization.WritingOptions()
     #if os(Linux)
         let parameters = parameters._bridgeToObject()
-    #elseif
+    #else
         let parameters = parameters.reduce([String : AnyObject]()) { result, item in
             var result = result
             if let value = item.1 as? AnyObject {
@@ -92,7 +92,7 @@ public enum ParameterEncoding {
             let key = item.0
         #if os(Linux)
             let value = item.1._bridgeToObject()
-        #elseif
+        #else
             let value = item.1
         #endif
 
