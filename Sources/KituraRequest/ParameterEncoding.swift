@@ -79,38 +79,39 @@ public enum ParameterEncoding {
 
     private func encodeInFormData(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
         print("form")
-        let boundaryString = String("kitura-request.boundary.%08x%08x", randomize(), randomize())
+        let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
+        print(boundaryString)
         let boundary = BodyBoundary(boundaryString)
 
-        // let parameters = self.getComponents(from: parameters)
-        // var httpBody = Data()
-        //
-        // for (index, bodyPart) in parameters.body.enumerated() {
-        //     let bodyBoundary: Data
-        //
-        //     if index == 0,
-        //         let initial = boundary.initial {
-        //             bodyBoundary = initial
-        //     } else if index != 0,
-        //         let encapsulated = boundary.encapsulated {
-        //             bodyBoundary = encapsulated
-        //     } else {
-        //         throw ParameterEncodingError.CouldNotCreateMultipart
-        //     }
-        //
-        //     httpBody.append(bodyBoundary)
-        //
-        //     httpBody.append(bodyPart.part.content(for: bodyPart.key))
-        // }
-        //
-        // guard let final = boundary.final else {
-        //     throw ParameterEncodingError.CouldNotCreateMultipart
-        // }
-        //
-        // httpBody.append(final)
-        //
-        // request.httpBody = httpBody
-        request.setValue("multipart/form-data;", forHTTPHeaderField: "Content-Type")
+        let parameters = self.getComponents(from: parameters)
+        var httpBody = Data()
+
+        for (index, bodyPart) in parameters.body.enumerated() {
+            let bodyBoundary: Data
+
+            if index == 0,
+                let initial = boundary.initial {
+                    bodyBoundary = initial
+            } else if index != 0,
+                let encapsulated = boundary.encapsulated {
+                    bodyBoundary = encapsulated
+            } else {
+                throw ParameterEncodingError.CouldNotCreateMultipart
+            }
+
+            httpBody.append(bodyBoundary)
+
+            httpBody.append(bodyPart.part.content(for: bodyPart.key))
+        }
+
+        guard let final = boundary.final else {
+            throw ParameterEncodingError.CouldNotCreateMultipart
+        }
+
+        httpBody.append(final)
+
+        request.httpBody = httpBody
+        request.setValue("multipart/form-data; boundary=\(boundary.value)", forHTTPHeaderField: "Content-Type")
         print("set header")
     }
 }

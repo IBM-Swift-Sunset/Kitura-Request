@@ -60,6 +60,9 @@ public class Request {
       options.append(.hostname(urlRequest.url!.absoluteString))
       #endif
 
+      if let headers = urlRequest.allHTTPHeaderFields {
+          options.append(.headers(headers))
+      }
 
       // Create request
       let request = HTTP.request(options) {

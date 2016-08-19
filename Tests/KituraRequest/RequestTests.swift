@@ -50,7 +50,7 @@ class RequestTests: XCTestCase {
             "https://httpbin.org/post",
             parameters: [
                 "file" : "dasd"
-            ], encoding: .JSON,
+            ], encoding: .Multipart,
             headers: [
                 "lol" : "lol"
             ])
@@ -59,7 +59,6 @@ class RequestTests: XCTestCase {
         request.response { re, _, data, error in
             print("----")
             print("\(dataToString(data))")
-            print("\(re?.allHTTPHeaderFields)")
         }
     }
 }
