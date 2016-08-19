@@ -18,15 +18,15 @@ import Foundation
 
 public class KituraRequest {
 
-  #if os(Linux)
+  // #if os(Linux)
   public static func request(method: RequestMethod,
                             _ URL: String,
                             parameters: [String: Any]? = nil,
                             encoding: ParameterEncoding = .URL,
                             headers: [String: String]? = nil) -> Request {
-  
-    let parameters = convertValuesToAnyObject(parameters)
-    
+
+    // let parameters = convertValuesToAnyObject(parameters)
+
     let request =  Request(method: method,
                            URL,
                            parameters: parameters,
@@ -35,20 +35,20 @@ public class KituraRequest {
     request.submit()
     return request
   }
-  #else
-  public static func request(method: RequestMethod,
-                            _ URL: String,
-                            parameters: [String: AnyObject]? = nil,
-                            encoding: ParameterEncoding = .URL,
-                            headers: [String: String]? = nil) -> Request {
-    
-    let request =  Request(method: method,
-                           URL,
-                           parameters: parameters,
-                           encoding: encoding,
-                           headers: headers)
-    request.submit()
-    return request
-  }
-  #endif
+  // #else
+  // public static func request(method: RequestMethod,
+  //                           _ URL: String,
+  //                           parameters: [String: AnyObject]? = nil,
+  //                           encoding: ParameterEncoding = .URL,
+  //                           headers: [String: String]? = nil) -> Request {
+  //
+  //   let request =  Request(method: method,
+  //                          URL,
+  //                          parameters: parameters,
+  //                          encoding: encoding,
+  //                          headers: headers)
+  //   request.submit()
+  //   return request
+  // }
+  // #endif
 }

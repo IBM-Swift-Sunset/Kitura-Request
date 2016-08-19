@@ -21,22 +21,22 @@ import KituraNet
 @testable import KituraRequest
 
 class RequestTests: XCTestCase {
-  
+
   var testRequest = KituraRequest.request(method: .POST,
                                           "https://google.com",
                                           parameters: ["asd":"asd"],
                                           encoding: .URL,
                                           headers: ["User-Agent":"Kitura-Server"]
   )
-  
+
   func testRequestAssignsClientRequestURL() {
     XCTAssertEqual(testRequest.request?.url, "https://google.com?asd=asd")
   }
-  
+
   func testRequestAssignClientRequestMethod() {
     XCTAssertEqual(testRequest.request?.method, "POST")
   }
-  
+
   func testRequestAssignsClientRequestHeaders() {
     if let headers = testRequest.request?.headers {
       XCTAssertEqual(headers["User-Agent"], "Kitura-Server")
@@ -44,6 +44,24 @@ class RequestTests: XCTestCase {
       XCTFail()
     }
   }
+
+    func testMultipartRequest() {
+        let request = KituraRequest.request(method: .POST,
+            "https://httpbin.org/post",
+            parameters: [
+                "file" : "dasd"
+            ], encoding: .JSON,
+            headers: [
+                "lol" : "lol"
+            ])
+
+            //dataToString request: ClientRequest?, response: ClientResponse?, data: Data?, error:Swift.Error?
+        request.response { re, _, data, error in
+            print("----")
+            print("\(dataToString(data))")
+            print("\(re?.allHTTPHeaderFields)")
+        }
+    }
 }
 
 extension RequestTests {

@@ -20,12 +20,12 @@ import Foundation
 
 class ParameterEncodingTests: XCTestCase {
   let url = URL(string: "https://66o.tech")!
-  
+
   // JSON encoding
-  
+
   func testJSONParameterEncodingWhenNilPassedAsParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
-    
+
     do {
       #if os(Linux)
         try ParameterEncoding.JSON.encode(&urlRequest, parameters: convertValuesToAnyObject(nil))
@@ -37,7 +37,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testJSONParameterEncodingWhenEmptyPassed() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -52,7 +52,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testJSONParameterEncodingSetsHeaders() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -66,7 +66,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testJSONParametersEncodingSetsBody() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -81,9 +81,9 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   // URL Encoding
-  
+
   func testURLParametersEncodingWithNilParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -97,7 +97,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithEmptyParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -111,7 +111,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithSimpleParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -125,7 +125,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithArray() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -139,7 +139,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithDictionary() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
@@ -154,7 +154,7 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithArrayNestedInDict() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
