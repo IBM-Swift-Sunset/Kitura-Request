@@ -62,7 +62,9 @@ public enum ParameterEncoding {
 
     private func encodeInJSON(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
         let options = JSONSerialization.WritingOptions()
-
+    #if os(Linux)
+        let parameters = parameters._bridgeToObject()
+    #elseif
         let parameters = parameters.reduce([String : AnyObject]()) { result, item in
             var result = result
             if let value = item.1 as? AnyObject {
@@ -70,6 +72,7 @@ public enum ParameterEncoding {
             }
             return result
         }
+    #endif
 
         let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
         request.httpBody = data
@@ -85,17 +88,21 @@ public enum ParameterEncoding {
 
         let parameters = self.getComponents(from: parameters)
 
-        var bodyParameters = parameters.body
-
-        bodyParameters += parameters.query.flatMap { item in
+        var bodyParameters = parameters.query.flatMap { item -> (key: String, part: BodyPart)? in
             let key = item.0
+        #if os(Linux)
+            let value = item.1._bridgeToObject()
+        #elseif
             let value = item.1
+        #endif
 
             guard let returnValue = BodyPart(value) else {
                 return nil
             }
             return (key, returnValue)
         }
+
+        bodyParameters += parameters.body
 
         var httpBody = Data()
 
