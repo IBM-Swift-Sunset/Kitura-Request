@@ -197,16 +197,17 @@ extension ParameterEncoding {
         var query = QueryComponents()
         var body = BodyPartComponents()
 
-	#if os(Linux)
+/*	#if os(Linux)
 	guard let objParameters = convertValuesToAnyObject(dictionary) else { return ([], []) }
-	let dictionary = objParameters._bridgeToObject()
+	let dictionary = dictionary._bridgeToObject()
 	#endif
+*/
         for element in dictionary {
-	#if os(Linux)
-	    let key = (element.0 as! NSString).bridge()
-	#else
+	//#if os(Linux)
+	//    let key = (element.0 as! NSString).bridge()
+	//#else
 	    let key = element.0
-	#endif
+	//#endif
             let components = getQueryComponent(key, element.1)
             query += components.query
             body += components.body

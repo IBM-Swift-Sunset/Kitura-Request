@@ -46,12 +46,12 @@ class RequestTests: XCTestCase {
   }
 
     func testMultipartRequest() {
-  //      let data = Data()
+       let data = Data()
         let request = KituraRequest.request(method: .POST,
             "http://httpbin.org/post",
             parameters: [
                 "key" : "112",
-//                "file" : BodyPart(data: data, mimeType: .image(type: .jpeg), fileName: "image.jpg")
+                "file" : BodyPart(data: data, mimeType: .image(type: .jpeg), fileName: "image.jpg")
             ], encoding: .Multipart,
             headers: [
                 "lol" : "lol"
