@@ -36,6 +36,7 @@ public enum ParameterEncoding {
 
         switch self {
         case .URL:
+	    //guard let objParameters = convertValuesToAnyObject(parameters) else { return }
             try self.encodeInURL(request: &request, parameters: parameters)
         case .JSON:
             try self.encodeInJSON(request: &request, parameters: parameters)
@@ -196,8 +197,17 @@ extension ParameterEncoding {
         var query = QueryComponents()
         var body = BodyPartComponents()
 
+	#if os(Linux)
+	guard let objParameters = convertValuesToAnyObject(dictionary) else { return ([], []) }
+	let dictionary = objParameters._bridgeToObject()
+	#endif
         for element in dictionary {
-            let components = getQueryComponent(element.0, element.1)
+	#if os(Linux)
+	    let key = (element.0 as! NSString).bridge()
+	#else
+	    let key = element.0
+	#endif
+            let components = getQueryComponent(key, element.1)
             query += components.query
             body += components.body
         }
