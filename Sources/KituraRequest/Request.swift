@@ -75,7 +75,7 @@ public class Request {
         }
     }
 
-    public func response(_ completionHandler: CompletionHandler) {
+    public func response(_ completionHandler: @escaping CompletionHandler) {
         guard let response = response else {
             completionHandler((request, nil, nil, error))
             return
