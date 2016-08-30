@@ -16,7 +16,7 @@
 
 import XCTest
 
-@testable import KituraRequestTestSuite
+@testable import KituraRequestTests
 
 XCTMain([
   testCase(ParameterEncodingTests.allTests),
