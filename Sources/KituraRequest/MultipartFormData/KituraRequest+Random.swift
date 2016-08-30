@@ -13,22 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+ 
+#if os(Linux)
+import Glibc
+#else
+import Darwin
+#endif
 
-import Foundation
-
-public class KituraRequest {
-
-  public static func request(method: RequestMethod,
-        _ URL: String,
-        parameters: [String: Any]? = nil,
-        encoding: ParameterEncoding = .URL,
-        headers: [String: String]? = nil) -> Request {
-    let request =  Request(method: method,
-                           URL,
-                           parameters: parameters,
-                           encoding: encoding,
-                           headers: headers)
-    request.submit()
-    return request
-  }
+func randomize(max: Int? = nil) -> Int {
+    #if os(Linux)
+        return max == nil ? Int(random()) : Int(random() % (max! + 1))
+    #else
+        return max == nil ? Int(arc4random_uniform(UInt32.max)) : Int(arc4random_uniform(UInt32(max!)))
+    #endif
 }

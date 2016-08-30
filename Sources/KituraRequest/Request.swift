@@ -14,7 +14,6 @@
  * limitations under the License.
  **/
 
-
 import Foundation
 import KituraNet
 
@@ -54,12 +53,7 @@ public class Request {
 
             try encoding.encode(&urlRequest, parameters: parameters)
 
-            // HACK: find a proper solution
-            #if os(Linux)
-                options.append(.hostname(urlRequest.url!.absoluteString!))
-            #else
-                options.append(.hostname(urlRequest.url!.absoluteString))
-            #endif
+            options.append(.hostname(urlRequest.url!.absoluteString))
 
             if let headers = urlRequest.allHTTPHeaderFields {
                 options.append(.headers(headers))

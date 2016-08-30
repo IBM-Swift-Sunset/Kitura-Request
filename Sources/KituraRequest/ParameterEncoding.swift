@@ -36,7 +36,6 @@ public enum ParameterEncoding {
 
         switch self {
         case .URL:
-	    //guard let objParameters = convertValuesToAnyObject(parameters) else { return }
             try self.encodeInURL(request: &request, parameters: parameters)
         case .JSON:
             try self.encodeInJSON(request: &request, parameters: parameters)
@@ -63,15 +62,12 @@ public enum ParameterEncoding {
 
     private func encodeInJSON(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
         let options = JSONSerialization.WritingOptions()
-
         let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
         request.httpBody = data
-        // set content type to application/json
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     }
 
     private func encodeInFormData(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
-        print("form")
         let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
         print(boundaryString)
         let boundary = BodyBoundary(boundaryString)
@@ -80,11 +76,7 @@ public enum ParameterEncoding {
 
         var bodyParameters = parameters.query.flatMap { item -> (key: String, part: BodyPart)? in
             let key = item.0
-        #if os(Linux)
-            let value = item.1._bridgeToObject()
-        #else
             let value = item.1
-        #endif
 
             guard let returnValue = BodyPart(value) else {
                 return nil
@@ -123,7 +115,6 @@ public enum ParameterEncoding {
 
         request.httpBody = httpBody
         request.setValue("multipart/form-data; boundary=\(boundary.value)", forHTTPHeaderField: "Content-Type")
-        print("set header")
     }
 }
 
@@ -140,42 +131,18 @@ extension ParameterEncoding {
         case let bodyPart as BodyPart:
             bodyPartComponents += [(key: key, part: bodyPart)]
             break
-        case let d as [String: AnyObject]:
-            for (k, v) in d {
-                let components = getQueryComponent("\(key)[\(k)]", v)
+        case let dictionary as [String: Any]:
+            for (valueKey, value) in dictionary {
+                let components = getQueryComponent("\(key)[\(valueKey)]", value)
                 queryComponents += components.query
                 bodyPartComponents += components.body
             }
-        case let d as NSDictionary:
-        #if os(Linux)
-            let convertedD = d.bridge() // [NSObject : AnyObject]
-            for (k, v) in convertedD {
-                if let kk = k as? NSString {
-                    let components = getQueryComponent("\(key)[\(kk.bridge())]", v)
-                    queryComponents += components.query
-                    bodyPartComponents += components.body
-                } // else consider throw or something
-            }
-        #else
-            break
-        #endif
-        case let a as [AnyObject]:
-              for value in a {
+        case let array as [Any]:
+              for value in array {
                 let components = getQueryComponent(key + "[]", value)
                 queryComponents += components.query
                 bodyPartComponents += components.body
               }
-
-            case let a as NSArray:
-        #if os(Linux)
-            for value in a.bridge() {
-                let components = getQueryComponent(key + "[]", value)
-                queryComponents += components.query
-                bodyPartComponents += components.body
-            }
-        #else
-            break
-        #endif
         default:
             queryComponents.append((key, "\(value)"))
         }
