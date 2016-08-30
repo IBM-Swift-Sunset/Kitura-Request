@@ -57,8 +57,8 @@ public struct BodyPart {
     private(set) var mimeType: MimeType
     private(set) var fileName: String?
 
-    public init?(_ object: AnyObject) {
-        let string = String(object)
+    public init?(_ object: Any) {
+        let string = String(describing: object)
         guard let data = string.data(using: .utf8, allowLossyConversion: false) else {
             return nil
         }

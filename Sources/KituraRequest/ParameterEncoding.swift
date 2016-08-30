@@ -52,7 +52,7 @@ public enum ParameterEncoding {
             throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
         }
 
-        components.query = getQueryComponents(fromDictionary: parameters)
+        components.query = ParameterEncoding.getQueryComponents(fromDictionary: parameters)
 
         guard let newURL = components.url else {
             throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
@@ -63,17 +63,6 @@ public enum ParameterEncoding {
 
     private func encodeInJSON(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
         let options = JSONSerialization.WritingOptions()
-    #if os(Linux)
-        let parameters = parameters._bridgeToObject()
-    #else
-        let parameters = parameters.reduce([String : AnyObject]()) { result, item in
-            var result = result
-            if let value = item.1 as? AnyObject {
-                result[item.0] = value
-            }
-            return result
-        }
-    #endif
 
         let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
         request.httpBody = data
@@ -87,7 +76,7 @@ public enum ParameterEncoding {
         print(boundaryString)
         let boundary = BodyBoundary(boundaryString)
 
-        let parameters = self.getComponents(from: parameters)
+        let parameters = ParameterEncoding.getComponents(from: parameters)
 
         var bodyParameters = parameters.query.flatMap { item -> (key: String, part: BodyPart)? in
             let key = item.0
@@ -139,10 +128,11 @@ public enum ParameterEncoding {
 }
 
 extension ParameterEncoding {
+
     typealias QueryComponents = [(String, String)]
     typealias BodyPartComponents = [(key: String, part: BodyPart)]
 
-    private func getQueryComponent(_ key: String, _ value: Any) -> (query: QueryComponents, body: BodyPartComponents) {
+    private static func getQueryComponent(_ key: String, _ value: Any) -> (query: QueryComponents, body: BodyPartComponents) {
         var queryComponents = QueryComponents()
         var bodyPartComponents = BodyPartComponents()
 
@@ -193,21 +183,12 @@ extension ParameterEncoding {
         return (queryComponents, bodyPartComponents)
     }
 
-    private func getComponents(from dictionary: [String: Any]) -> (query: QueryComponents, body: BodyPartComponents) {
+    fileprivate static  func getComponents(from dictionary: [String: Any]) -> (query: QueryComponents, body: BodyPartComponents) {
         var query = QueryComponents()
         var body = BodyPartComponents()
 
-/*	#if os(Linux)
-	guard let objParameters = convertValuesToAnyObject(dictionary) else { return ([], []) }
-	let dictionary = dictionary._bridgeToObject()
-	#endif
-*/
         for element in dictionary {
-	//#if os(Linux)
-	//    let key = (element.0 as! NSString).bridge()
-	//#else
 	    let key = element.0
-	//#endif
             let components = getQueryComponent(key, element.1)
             query += components.query
             body += components.body
@@ -216,7 +197,7 @@ extension ParameterEncoding {
         return (query, body)
     }
 
-    func getQueryComponents(fromDictionary dict: [String: Any]) -> String {
+    fileprivate static func getQueryComponents(fromDictionary dict: [String: Any]) -> String {
         let query = self.getComponents(from: dict).query
         return (query.map { "\($0)=\($1)" } as [String]).joined(separator: "&")
     }

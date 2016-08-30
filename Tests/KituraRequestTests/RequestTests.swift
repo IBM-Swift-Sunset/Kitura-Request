@@ -46,7 +46,7 @@ class RequestTests: XCTestCase {
   }
 
     func testMultipartRequest() {
-       let data = Data()
+        let data = try! Data(contentsOf: URL(string: "http://images.vfl.ru/ii/1466715760/2c9e5822/13130971.jpg")!)
         let request = KituraRequest.request(method: .POST,
             "http://httpbin.org/post",
             parameters: [
@@ -67,11 +67,7 @@ class RequestTests: XCTestCase {
 
 extension RequestTests {
   static var allTests : [(String, (RequestTests) -> () throws -> Void)] {
-    return [
-	("testRequestAssignsClientRequestURL", testRequestAssignsClientRequestURL),
-	("testRequestAssignClientRequestMethod", testRequestAssignClientRequestMethod),
-	("testRequestAssignsClientRequestHeaders", testRequestAssignsClientRequestHeaders),
-	("testMultipartRequest", testMultipartRequest)
-    ]
+    return [("testRequestAssignsClientRequestURL", testRequestAssignsClientRequestURL),
+    ("testRequestAssignClientRequestMethod", testRequestAssignClientRequestMethod)]
   }
 }
