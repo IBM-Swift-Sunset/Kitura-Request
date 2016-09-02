@@ -22,6 +22,7 @@ public struct BodyPart {
     public enum MimeType {
 
         public enum Image: String {
+            case any = "*"
             case png = "png"
             case jpeg = "jpeg"
         }
