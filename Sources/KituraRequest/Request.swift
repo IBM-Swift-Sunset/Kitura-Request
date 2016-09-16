@@ -35,7 +35,7 @@ public class Request {
 
   public init(method: RequestMethod,
              _ URL: String,
-             parameters: [String: AnyObject]? = nil,
+             parameters: [String: Any]? = nil,
              encoding: ParameterEncoding = .url,
              headers: [String: String]? = nil) {
 
@@ -53,12 +53,7 @@ public class Request {
 
       try encoding.encode(&urlRequest, parameters: parameters)
 
-      // HACK: find a proper solution
-      #if os(Linux)
-      options.append(.hostname(urlRequest.url!.absoluteString!))
-      #else
       options.append(.hostname(urlRequest.url!.absoluteString))
-      #endif
 
 
       // Create request

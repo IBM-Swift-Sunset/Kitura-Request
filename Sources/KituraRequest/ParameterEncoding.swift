@@ -16,6 +16,7 @@
  **/
 
 import Foundation
+import Bridging
 
 public enum ParameterEncodingError: Swift.Error {
   case couldNotCreateComponentsFromURL
@@ -38,7 +39,7 @@ public enum ParameterEncoding {
       guard var components = URLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
         throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
       }
-      //var comps = components
+
       components.query = getQueryComponents(fromDictionary: parameters)
 
       guard let newURL = components.url else {
@@ -50,7 +51,7 @@ public enum ParameterEncoding {
       let options = JSONSerialization.WritingOptions()
       // need to convert to NSDictionary as Dictionary(struct) is not AnyObject(instance of class only)
       #if os(Linux)
-        let safe_parameters = parameters._bridgeToObject() // don't try to print!!!
+        let safe_parameters = parameters._bridgeToAnyObject() // don't try to print!!!
       #else
         let safe_parameters = parameters as NSDictionary
       #endif
@@ -77,10 +78,10 @@ extension ParameterEncoding {
       }
     case let d as NSDictionary:
     #if os(Linux)
-      let convertedD = d.bridge() // [NSObject : AnyObject]
+      let convertedD = d._bridgeToSwift() // [NSObject : AnyObject]
       for (k, v) in convertedD {
         if let kk = k as? NSString {
-          queryComponents += getQueryComponent("\(key)[\(kk.bridge())]", v)
+          queryComponents += getQueryComponent("\(key)[\(kk._bridgeToSwift()))]", v)
         } // else consider throw or something
       }
     #else
@@ -93,7 +94,7 @@ extension ParameterEncoding {
 
     case let a as NSArray:
     #if os(Linux)
-      for value in a.bridge() {
+      for value in a._bridgeToSwift() {
         queryComponents += getQueryComponent(key + "[]", value)
       }
     #else

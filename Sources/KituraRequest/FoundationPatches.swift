@@ -53,19 +53,19 @@ import Foundation
 //}
 
 #if os(Linux)
-  func convertValuesToAnyObject(_ d: [String: Any]?) -> [String: AnyObject]? {
+  /*func convertValuesToAnyObject(_ d: [String: Any]?) -> [String: AnyObject]? {
 
     guard let d = d else {
       return nil
     }
 
-    let nsdict = d.bridge()
-    let backdict = nsdict.bridge() // looks hacky but produces [NSObject: AnyObject] hassle free
+    //let nsdict = d.bridge()
+    //let backdict = nsdict._bridgeToSwift() // looks hacky but produces [NSObject: AnyObject] hassle free
 
     var result: [String: AnyObject] = [:]
-    for (key, value) in backdict {
-      result[(key as! NSString).bridge()] = value
+    for (key, value) in d {
+      result[key] = (value as AnyObject)
     }
     return result
-  }
+  }*/
 #endif

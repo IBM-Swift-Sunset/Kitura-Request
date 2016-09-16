@@ -18,27 +18,10 @@ import Foundation
 
 public class KituraRequest {
 
-  #if os(Linux)
-  public static func request(method: RequestMethod,
-                            _ URL: String,
-                            parameters: [String: Any]? = nil,
-                            encoding: ParameterEncoding = .URL,
-                            headers: [String: String]? = nil) -> Request {
 
-    let parameters = convertValuesToAnyObject(parameters)
-
-    let request =  Request(method: method,
-                           URL,
-                           parameters: parameters,
-                           encoding: encoding,
-                           headers: headers)
-    request.submit()
-    return request
-  }
-  #else
   public static func request(_ method: RequestMethod,
                             _ URL: String,
-                            parameters: [String: AnyObject]? = nil,
+                            parameters: [String: Any]? = nil,
                             encoding: ParameterEncoding = .url,
                             headers: [String: String]? = nil) -> Request {
 
@@ -50,5 +33,4 @@ public class KituraRequest {
     request.submit()
     return request
   }
-  #endif
 }
