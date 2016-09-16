@@ -16,12 +16,12 @@
 
 import XCTest
 import Foundation
-@testable import KituraRequest
+import KituraRequest
 
 class E2ETests: XCTestCase {
-  
+
   func testRequestReturnsData() {
-    KituraRequest.request(method: .GET, "https://httpbin.org/html")
+    KituraRequest.request(.GET, "https://httpbin.org/html")
       .response {
         _, _, data, _ in
         if data != nil {
@@ -34,7 +34,7 @@ class E2ETests: XCTestCase {
 }
 
 extension E2ETests {
-  static var allTests : [(String, (E2ETests) -> () throws -> Void)] {
+  static var allTests: [(String, (E2ETests) -> () throws -> Void)] {
     return [
              ("testRequestReturnsData", testRequestReturnsData)
     ]

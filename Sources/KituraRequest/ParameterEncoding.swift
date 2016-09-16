@@ -18,16 +18,15 @@
 import Foundation
 
 public enum ParameterEncodingError: Swift.Error {
-    case CouldNotCreateComponentsFromURL
-    case CouldNotCreateURLFromComponents
-    case CouldNotCreateMultipart
+    case couldNotCreateComponentsFromURL
+    case couldNotCreateURLFromComponents
+    case couldNotCreateMultipart
 }
 
 public enum ParameterEncoding {
-    case URL
-    case JSON
-    case Multipart
-    case Custom
+    case url
+    case json
+    case custom
 
     func encode(_ request: inout NSMutableURLRequest, parameters: [String: Any]?) throws {
         guard let parameters = parameters, !parameters.isEmpty else {

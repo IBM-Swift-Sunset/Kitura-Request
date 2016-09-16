@@ -15,9 +15,9 @@
  **/
 
 public enum RequestError: Swift.Error {
-  case InvalidURL
-  case NoSchemeProvided
-  case NoHostProvided
-  case NotImplemented
-  case ParameterCanNotBeEncoded
+  case invalidURL
+  case noSchemeProvided
+  case noHostProvided
+  case notImplemented
+  case parameterCanNotBeEncoded
 }
