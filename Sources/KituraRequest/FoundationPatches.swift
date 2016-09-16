@@ -42,7 +42,7 @@ import Foundation
 //      return NSURLComponents(url: url, resolvingAgainstBaseURL: resolve)
 //    #endif
 //  }
-//  
+//
 //  func safeGetURL() -> URL? {
 //    #if os(Linux)
 //      return self.URL
@@ -54,14 +54,14 @@ import Foundation
 
 #if os(Linux)
   func convertValuesToAnyObject(_ d: [String: Any]?) -> [String: AnyObject]? {
-    
+
     guard let d = d else {
       return nil
     }
-    
+
     let nsdict = d.bridge()
     let backdict = nsdict.bridge() // looks hacky but produces [NSObject: AnyObject] hassle free
-    
+
     var result: [String: AnyObject] = [:]
     for (key, value) in backdict {
       result[(key as! NSString).bridge()] = value
@@ -69,5 +69,3 @@ import Foundation
     return result
   }
 #endif
-
-

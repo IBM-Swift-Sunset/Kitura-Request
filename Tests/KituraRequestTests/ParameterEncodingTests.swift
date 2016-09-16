@@ -20,60 +20,60 @@ import Foundation
 
 class ParameterEncodingTests: XCTestCase {
   let url = URL(string: "https://66o.tech")!
-  
+
   // JSON encoding
-  
+
   func testJSONParameterEncodingWhenNilPassedAsParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
-    
+
     do {
       #if os(Linux)
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: convertValuesToAnyObject(nil))
+        try ParameterEncoding.json.encode(&urlRequest, parameters: convertValuesToAnyObject(nil))
       #else
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: nil)
+        try ParameterEncoding.json.encode(&urlRequest, parameters: nil)
       #endif
       XCTAssertNil(urlRequest.httpBody)
     } catch {
       XCTFail()
     }
   }
-  
+
   func testJSONParameterEncodingWhenEmptyPassed() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: convertValuesToAnyObject([:]))
+        try ParameterEncoding.json.encode(&urlRequest, parameters: convertValuesToAnyObject([:]))
       #else
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: [:])
+        try ParameterEncoding.json.encode(&urlRequest, parameters: [:])
       #endif
-      try ParameterEncoding.JSON.encode(&urlRequest, parameters: [:])
+      try ParameterEncoding.json.encode(&urlRequest, parameters: [:])
       XCTAssertNil(urlRequest.httpBody)
     } catch {
       XCTFail()
     }
   }
-  
+
   func testJSONParameterEncodingSetsHeaders() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: convertValuesToAnyObject(["p1":1]))
+        try ParameterEncoding.json.encode(&urlRequest, parameters: convertValuesToAnyObject(["p1":1]))
       #else
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: ["p1":1])
+        try ParameterEncoding.json.encode(&urlRequest, parameters: ["p1":1])
       #endif
       XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Content-Type"), "application/json")
     } catch {
       XCTFail()
     }
   }
-  
+
   func testJSONParametersEncodingSetsBody() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: convertValuesToAnyObject(["p1":1]))
+        try ParameterEncoding.json.encode(&urlRequest, parameters: convertValuesToAnyObject(["p1":1]))
       #else
-        try ParameterEncoding.JSON.encode(&urlRequest, parameters: ["p1":1])
+        try ParameterEncoding.json.encode(&urlRequest, parameters: ["p1":1 as AnyObject])
       #endif
       let body = dataToString(urlRequest.httpBody)
       XCTAssertEqual(body, "{\"p1\":1}")
@@ -81,88 +81,88 @@ class ParameterEncodingTests: XCTestCase {
       XCTFail()
     }
   }
-  
+
   // URL Encoding
-  
+
   func testURLParametersEncodingWithNilParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: convertValuesToAnyObject(nil))
+        try ParameterEncoding.url.encode(&urlRequest, parameters: convertValuesToAnyObject(nil))
       #else
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: nil)
+        try ParameterEncoding.url.encode(&urlRequest, parameters: nil)
       #endif
       XCTAssertEqual(urlRequest.url?.absoluteURL, url.absoluteURL)
     } catch {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithEmptyParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: convertValuesToAnyObject([:]))
+        try ParameterEncoding.url.encode(&urlRequest, parameters: convertValuesToAnyObject([:]))
       #else
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: [:])
+        try ParameterEncoding.url.encode(&urlRequest, parameters: [:])
       #endif
       XCTAssertEqual(urlRequest.url?.absoluteString, url.absoluteString)
     } catch {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithSimpleParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: convertValuesToAnyObject(["a":1, "b":2]))
+        try ParameterEncoding.url.encode(&urlRequest, parameters: convertValuesToAnyObject(["a":1, "b":2]))
       #else
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: ["a":1, "b":2])
+        try ParameterEncoding.url.encode(&urlRequest, parameters: ["a":1, "b":2])
       #endif
       XCTAssertEqual(urlRequest.url?.query, "b=2&a=1") // this may be brittle
     } catch {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithArray() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: convertValuesToAnyObject(["a":[1, 2]]))
+        try ParameterEncoding.url.encode(&urlRequest, parameters: convertValuesToAnyObject(["a":[1, 2]]))
       #else
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: ["a":[1, 2]])
+        try ParameterEncoding.url.encode(&urlRequest, parameters: ["a":[1, 2]])
       #endif
       XCTAssertEqual(urlRequest.url?.query, "a%5B%5D=1&a%5B%5D=2") // this may be brittle
     } catch {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithDictionary() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
         let nestedDict: [String: Any] = ["b" : 1]
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: convertValuesToAnyObject(["a" : nestedDict]))
+        try ParameterEncoding.url.encode(&urlRequest, parameters: convertValuesToAnyObject(["a" : nestedDict]))
       #else
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: ["a" : ["b" : 1]])
+        try ParameterEncoding.url.encode(&urlRequest, parameters: ["a" : ["b" : 1]])
       #endif
       XCTAssertEqual(urlRequest.url?.query, "a%5Bb%5D=1") // this may be brittle
     } catch {
       XCTFail()
     }
   }
-  
+
   func testURLParametersEncodingWithArrayNestedInDict() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
       #if os(Linux)
         let nestedDict: [String: Any] = ["b" : [1, 2]]
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: convertValuesToAnyObject(["a" : nestedDict]))
+        try ParameterEncoding.url.encode(&urlRequest, parameters: convertValuesToAnyObject(["a" : nestedDict]))
       #else
-        try ParameterEncoding.URL.encode(&urlRequest, parameters: ["a" : ["b" : [1, 2]]])
+        try ParameterEncoding.url.encode(&urlRequest, parameters: ["a" : ["b" : [1, 2]]])
       #endif
       XCTAssertEqual(urlRequest.url?.query, "a%5Bb%5D%5B%5D=1&a%5Bb%5D%5B%5D=2") // this may be brittle
     } catch {
@@ -172,7 +172,7 @@ class ParameterEncodingTests: XCTestCase {
 }
 
 extension ParameterEncodingTests {
-  static var allTests : [(String, (ParameterEncodingTests) -> () throws -> Void)] {
+  static var allTests: [(String, (ParameterEncodingTests) -> () throws -> Void)] {
     return [
              ("testJSONParameterEncodingWhenNilPassedAsParameters", testJSONParameterEncodingWhenNilPassedAsParameters),
              ("testJSONParameterEncodingWhenEmptyPassed", testJSONParameterEncodingWhenEmptyPassed),
@@ -183,7 +183,7 @@ extension ParameterEncodingTests {
               testURLParametersEncodingWithEmptyParameters),
              ("testURLParametersEncodingWithSimpleParameters",
               testURLParametersEncodingWithSimpleParameters),
-             ("testURLParametersEncodingWithArray",testURLParametersEncodingWithArray),
+             ("testURLParametersEncodingWithArray", testURLParametersEncodingWithArray),
              ("testURLParametersEncodingWithDictionary", testURLParametersEncodingWithDictionary),
              ("testURLParametersEncodingWithArrayNestedInDict", testURLParametersEncodingWithArrayNestedInDict)
     ]

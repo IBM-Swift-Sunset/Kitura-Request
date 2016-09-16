@@ -21,45 +21,45 @@ import KituraNet
 @testable import KituraRequest
 
 class URLFormatterTests: XCTestCase {
-  
+
   override func setUp() {
     super.setUp()
   }
-  
+
   func testRequestWithInvalidReturnsError() {
     let invalidURL = "http://💩.com"
     let testRequest = Request(method: .GET, invalidURL)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.InvalidURL)
+    XCTAssertEqual(testRequest.error as? RequestError, RequestError.invalidURL)
   }
-  
+
   func testRequestWithURLWithoutSchemeReturnsError() {
     let URLWithoutScheme = "apple.com"
     let testRequest = Request(method: .GET, URLWithoutScheme)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.NoSchemeProvided)
+    XCTAssertEqual(testRequest.error as? RequestError, RequestError.noSchemeProvided)
   }
-  
+
   func testRequestWithNoHostReturnsError() {
     let URLWithoutHost = "http://"
     let testRequest = Request(method: .GET, URLWithoutHost)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.NoHostProvided)
+    XCTAssertEqual(testRequest.error as? RequestError, RequestError.noHostProvided)
   }
-  
+
   func testRequestWithNoHostAndQueryReturnsError() {
     let URLWithoutHost = "http://?asd=asd"
     let testRequest = Request(method: .GET, URLWithoutHost)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.NoHostProvided)
+    XCTAssertEqual(testRequest.error as? RequestError, RequestError.noHostProvided)
   }
-  
+
   func testValidURLCreatesValidClientRequest() {
     let validURL = "https://66o.tech"
     let testRequest = Request(method: .GET, validURL)
-    
+
     XCTAssertEqual(testRequest.request?.url, validURL)
   }
 }
 
 extension URLFormatterTests {
-  static var allTests : [(String, (URLFormatterTests) -> () throws -> Void)] {
+  static var allTests: [(String, (URLFormatterTests) -> () throws -> Void)] {
     return [
              ("testRequestWithInvalidReturnsError", testRequestWithInvalidReturnsError),
              ("testRequestWithURLWithoutSchemeReturnsError", testRequestWithURLWithoutSchemeReturnsError),

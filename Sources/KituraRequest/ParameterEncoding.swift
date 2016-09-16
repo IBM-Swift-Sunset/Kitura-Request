@@ -18,35 +18,35 @@
 import Foundation
 
 public enum ParameterEncodingError: Swift.Error {
-  case CouldNotCreateComponentsFromURL
-  case CouldNotCreateURLFromComponents
+  case couldNotCreateComponentsFromURL
+  case couldNotCreateURLFromComponents
 }
 
 public enum ParameterEncoding {
-  case URL
-  case JSON
-  case Custom
-  
-  func encode(_ request: inout NSMutableURLRequest, parameters: [String: AnyObject]?) throws {
-    
+  case url
+  case json
+  case custom
+
+  func encode( _ request: inout NSMutableURLRequest, parameters: [String: Any]?) throws {
+
     guard let parameters = parameters, !parameters.isEmpty else {
       return
     }
-    
+
     switch self {
-    case .URL:
-      guard let components = NSURLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
-        throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
+    case .url:
+      guard var components = URLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
+        throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
       }
-      
+      //var comps = components
       components.query = getQueryComponents(fromDictionary: parameters)
-      
+
       guard let newURL = components.url else {
-        throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
+        throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
       }
       request.url = newURL
-      
-    case .JSON:
+
+    case .json:
       let options = JSONSerialization.WritingOptions()
       // need to convert to NSDictionary as Dictionary(struct) is not AnyObject(instance of class only)
       #if os(Linux)
@@ -59,19 +59,19 @@ public enum ParameterEncoding {
       // set content type to application/json
       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     default:
-      throw RequestError.NotImplemented
+      throw RequestError.notImplemented
     }
   }
 }
 
 extension ParameterEncoding {
   typealias QueryComponents = [(String, String)]
-  
-  private func getQueryComponent(_ key: String, _ value: AnyObject) -> QueryComponents {
+
+  fileprivate func getQueryComponent(_ key: String, _ value: Any) -> QueryComponents {
     var queryComponents: QueryComponents = []
-    
+
     switch value {
-    case let d as [String: AnyObject]:
+    case let d as [String: Any]:
       for (k, v) in d {
         queryComponents += getQueryComponent("\(key)[\(k)]", v)
       }
@@ -90,7 +90,7 @@ extension ParameterEncoding {
       for value in a {
         queryComponents += getQueryComponent(key + "[]", value)
       }
-    
+
     case let a as NSArray:
     #if os(Linux)
       for value in a.bridge() {
@@ -104,14 +104,13 @@ extension ParameterEncoding {
     }
     return queryComponents
   }
-  
-  func getQueryComponents(fromDictionary dict: [String: AnyObject]) -> String {
-    var query: [(String,String)] = []
-    
+
+  func getQueryComponents(fromDictionary dict: [String: Any]) -> String {
+    var query: [(String, String)] = []
+
     for element in dict {
       query += getQueryComponent(element.0, element.1)
     }
-    
     return (query.map { "\($0)=\($1)" } as [String]).joined(separator: "&")
   }
 }

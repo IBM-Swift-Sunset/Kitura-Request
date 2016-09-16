@@ -24,9 +24,9 @@ public class KituraRequest {
                             parameters: [String: Any]? = nil,
                             encoding: ParameterEncoding = .URL,
                             headers: [String: String]? = nil) -> Request {
-  
+
     let parameters = convertValuesToAnyObject(parameters)
-    
+
     let request =  Request(method: method,
                            URL,
                            parameters: parameters,
@@ -36,12 +36,12 @@ public class KituraRequest {
     return request
   }
   #else
-  public static func request(method: RequestMethod,
+  public static func request(_ method: RequestMethod,
                             _ URL: String,
                             parameters: [String: AnyObject]? = nil,
-                            encoding: ParameterEncoding = .URL,
+                            encoding: ParameterEncoding = .url,
                             headers: [String: String]? = nil) -> Request {
-    
+
     let request =  Request(method: method,
                            URL,
                            parameters: parameters,

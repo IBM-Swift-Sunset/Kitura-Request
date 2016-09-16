@@ -27,63 +27,63 @@ public enum RequestMethod: String {
 public class Request {
   var request: ClientRequest?
   var response: ClientResponse?
-  var data: NSData?
+  var data: Data?
   var error: Swift.Error?
-  
-  public typealias ResponseArguments = (request: ClientRequest?, response: ClientResponse?, data: Data?, error:Swift.Error?)
+
+  public typealias ResponseArguments = (request: ClientRequest?, response: ClientResponse?, data: Data?, error: Swift.Error?)
   public typealias CompletionHandler = (ResponseArguments) -> Void
-  
+
   public init(method: RequestMethod,
              _ URL: String,
              parameters: [String: AnyObject]? = nil,
-             encoding: ParameterEncoding = .URL,
+             encoding: ParameterEncoding = .url,
              headers: [String: String]? = nil) {
-    
+
     do {
       var options: [ClientRequest.Options] = []
       options.append(.schema("")) // so that ClientRequest doesn't apend http
       options.append(.method(method.rawValue)) // set method of request
-      
+
       // headers
       if let headers = headers {
         options.append(.headers(headers))
       }
-      
+
       var urlRequest = try formatURL(URL)
-    
+
       try encoding.encode(&urlRequest, parameters: parameters)
-    
+
       // HACK: find a proper solution
       #if os(Linux)
       options.append(.hostname(urlRequest.url!.absoluteString!))
       #else
       options.append(.hostname(urlRequest.url!.absoluteString))
       #endif
-      
-      
+
+
       // Create request
       let request = HTTP.request(options) {
         response in
         self.response = response
       }
-      
+
       if let body = urlRequest.httpBody {
         request.write(from: body)
       }
-      
+
       self.request = request
     } catch {
       self.request = nil
       self.error = error
     }
   }
-  
+
   public func response(_ completionHandler: CompletionHandler) {
     guard let response = response else {
       completionHandler((request, nil, nil, error))
       return
     }
-    
+
     var data = Data()
     do {
       _ = try response.read(into: &data)
@@ -92,7 +92,7 @@ public class Request {
       print(error)
     }
   }
-  
+
   func submit() {
     request?.end()
   }
@@ -106,17 +106,17 @@ extension Request {
 
     // or use NSURL:
     guard let validURL = URL(string: url) else {
-      throw RequestError.InvalidURL
+      throw RequestError.invalidURL
     }
-    
+
     guard validURL.scheme != nil else {
-      throw RequestError.NoSchemeProvided
+      throw RequestError.noSchemeProvided
     }
-    
+
     guard validURL.host != nil else {
-      throw RequestError.NoHostProvided
+      throw RequestError.noHostProvided
     }
-    
+
     return NSMutableURLRequest(url: validURL)
   }
 }
