@@ -36,7 +36,7 @@ public class Request {
     public init(method: RequestMethod,
              _ URL: String,
              parameters: [String: Any]? = nil,
-             encoding: ParameterEncoding = .URL,
+             encoding: ParameterEncoding = .url,
              headers: [String: String]? = nil) {
 
         do {

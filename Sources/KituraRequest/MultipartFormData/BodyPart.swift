@@ -28,13 +28,15 @@ public struct BodyPart {
         }
 
         case none
-        // case text
-        case image(type: Image)
+        case text
+        case image(Image)
 
         var value: String? {
             switch self {
             case .image(let type):
                 return "image/\(type.rawValue)"
+            case .text:
+                return "text/plain"
             default:
                 break
             }
@@ -82,7 +84,7 @@ public struct BodyPart {
         var result = Data()
         let headerString = self.header(for: key)
         guard let header = headerString.data(using: .utf8, allowLossyConversion: false) else {
-            throw ParameterEncodingError.CouldNotCreateMultipart
+            throw ParameterEncodingError.couldNotCreateMultipart
         }
 
         result.append(header)

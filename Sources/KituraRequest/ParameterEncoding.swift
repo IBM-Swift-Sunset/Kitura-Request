@@ -26,6 +26,7 @@ public enum ParameterEncodingError: Swift.Error {
 public enum ParameterEncoding {
     case url
     case json
+    case multipart
     case custom
 
     func encode(_ request: inout NSMutableURLRequest, parameters: [String: Any]?) throws {
@@ -34,26 +35,26 @@ public enum ParameterEncoding {
         }
 
         switch self {
-        case .URL:
+        case .url:
             try self.encodeInURL(request: &request, parameters: parameters)
-        case .JSON:
+        case .json:
             try self.encodeInJSON(request: &request, parameters: parameters)
-        case .Multipart:
-            try self.encodeInFormData(request: &request, parameters: parameters)
+        case .multipart:
+            try self.encodeInMultipart(request: &request, parameters: parameters)
         default:
-            throw RequestError.NotImplemented
+            throw RequestError.notImplemented
         }
     }
 
     private func encodeInURL(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
         guard let components = NSURLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
-            throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
+            throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
         }
 
         components.query = ParameterEncoding.getQueryComponents(fromDictionary: parameters)
 
         guard let newURL = components.url else {
-            throw ParameterEncodingError.CouldNotCreateComponentsFromURL // this should never happen
+            throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
         }
 
         request.url = newURL
@@ -66,7 +67,7 @@ public enum ParameterEncoding {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     }
 
-    private func encodeInFormData(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
+    private func encodeInMultipart(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
         let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
         print(boundaryString)
         let boundary = BodyBoundary(boundaryString)
@@ -97,7 +98,7 @@ public enum ParameterEncoding {
                 let encapsulated = boundary.encapsulated {
                     bodyBoundary = encapsulated
             } else {
-                throw ParameterEncodingError.CouldNotCreateMultipart
+                throw ParameterEncodingError.couldNotCreateMultipart
             }
 
             httpBody.append(bodyBoundary)
@@ -107,7 +108,7 @@ public enum ParameterEncoding {
         }
 
         guard let final = boundary.final else {
-            throw ParameterEncodingError.CouldNotCreateMultipart
+            throw ParameterEncodingError.couldNotCreateMultipart
         }
 
         httpBody.append(final)
