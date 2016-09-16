@@ -46,28 +46,43 @@ class RequestTests: XCTestCase {
   }
 
     func testMultipartRequest() {
-        let data = try! Data(contentsOf: URL(string: "http://images.vfl.ru/ii/1466715760/2c9e5822/13130971.jpg")!)
-        let request = KituraRequest.request(method: .POST,
-            "http://httpbin.org/post",
-            parameters: [
-                "key" : "112",
-                "file" : BodyPart(data: data, mimeType: .image(type: .jpeg), fileName: "image.jpg")
-            ], encoding: .Multipart,
-            headers: [
-                "lol" : "lol"
-            ])
+        KituraRequest.request(method: .GET,
+            "http://httpbin.org/image/png").response { _, _, data, error in
+                guard let data = data else {
+                    XCTFail("data should exits")
+                    return;
+                }
 
-            //dataToString request: ClientRequest?, response: ClientResponse?, data: Data?, error:Swift.Error?
-        request.response { re, _, data, error in
-            print("----")
-            print("\(dataToString(data))")
-        }
+                KituraRequest.request(method: .POST,
+                    "http://httpbin.org/post",
+                    parameters: [
+                        "key" : "value",
+                        "file" : BodyPart(data: data, mimeType: .image(type: .png), fileName: "image.jpg")
+                    ], encoding: .Multipart).response { _, _, data, error in
+                        guard let string = dataToString(data) else {
+                            XCTFail("can't parse response")
+                            return
+                        }
+
+                        if !string.contains("\"file\": \"data:image/png;base64,") {
+                            XCTFail("file should exits in request")
+                        }
+
+                        if !string.contains("\"key\": \"value\"") {
+                            XCTFail("file should exits in request")
+                        }
+                }
+            }
     }
 }
 
 extension RequestTests {
   static var allTests : [(String, (RequestTests) -> () throws -> Void)] {
-    return [("testRequestAssignsClientRequestURL", testRequestAssignsClientRequestURL),
-    ("testRequestAssignClientRequestMethod", testRequestAssignClientRequestMethod)]
+    return [
+        ("testRequestAssignsClientRequestURL", testRequestAssignsClientRequestURL),
+        ("testRequestAssignClientRequestMethod", testRequestAssignClientRequestMethod),
+        ("testRequestAssignsClientRequestHeaders", testRequestAssignsClientRequestHeaders),
+        ("testMultipartRequest", testMultipartRequest)
+    ]
   }
 }
