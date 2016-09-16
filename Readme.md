@@ -16,11 +16,11 @@ TODO:
 - [x] Switch back to depend on IBM Kitura-net
  
 
-## Instalation
+## Installation
 To install KituraRequest add following line to Dependencies in `Package.json`:
 
 ```swift
-.Package(url: "https://github.com/michalkalinowski-/KituraRequest.git", majorVersion: 0)
+.Package(url: "https://github.com/IBM-Swift/Kitura-Request.git", majorVersion: 0)
 ```
 
 Currently `DEVELOPMENT-SNAPSHOT-2016-05-03-a` toolchain is supported
