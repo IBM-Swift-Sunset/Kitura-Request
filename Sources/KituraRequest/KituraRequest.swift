@@ -18,11 +18,13 @@ import Foundation
 
 public class KituraRequest {
 
+
   public static func request(_ method: RequestMethod,
-        _ URL: String,
-        parameters: [String: Any]? = nil,
-        encoding: ParameterEncoding = .url,
-        headers: [String: String]? = nil) -> Request {
+                            _ URL: String,
+                            parameters: [String: Any]? = nil,
+                            encoding: ParameterEncoding = .url,
+                            headers: [String: String]? = nil) -> Request {
+
     let request =  Request(method: method,
                            URL,
                            parameters: parameters,

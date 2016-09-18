@@ -16,6 +16,7 @@
  **/
 
 import Foundation
+import Bridging
 
 public enum ParameterEncodingError: Swift.Error {
     case couldNotCreateComponentsFromURL

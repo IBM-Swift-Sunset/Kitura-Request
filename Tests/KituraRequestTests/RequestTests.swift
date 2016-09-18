@@ -24,7 +24,7 @@ class RequestTests: XCTestCase {
 
   var testRequest = KituraRequest.request(.POST,
                                           "https://google.com",
-                                          parameters: ["asd" : "asd"],
+                                          parameters: ["asd":"asd"],
                                           encoding: .url,
                                           headers: ["User-Agent":"Kitura-Server"]
   )
