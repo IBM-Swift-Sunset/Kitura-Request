@@ -16,7 +16,6 @@
  **/
 
 import Foundation
-import Bridging
 
 public enum ParameterEncodingError: Swift.Error {
     case couldNotCreateComponentsFromURL
@@ -70,7 +69,6 @@ public enum ParameterEncoding {
 
     private func encodeInMultipart(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
         let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
-        print(boundaryString)
         let boundary = BodyBoundary(boundaryString)
 
         let parameters = ParameterEncoding.getComponents(from: parameters)

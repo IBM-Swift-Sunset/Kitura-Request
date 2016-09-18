@@ -16,6 +16,7 @@
 
 import Foundation
 import KituraNet
+import LoggerAPI
 
 public enum RequestMethod: String {
   case CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE
@@ -86,7 +87,7 @@ public class Request {
             _ = try response.read(into: &data)
             completionHandler((request, response, data, error))
         } catch {
-            print(error)
+            Log.error("Error in Kirutra-Request response: \(error)")
         }
     }
 
