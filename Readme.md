@@ -23,7 +23,7 @@ To install KituraRequest add following line to Dependencies in `Package.json`:
 .Package(url: "https://github.com/IBM-Swift/Kitura-Request.git", majorVersion: 0)
 ```
 
-Currently `DEVELOPMENT-SNAPSHOT-2016-05-03-a` toolchain is supported
+Currently `Swift 3.0 Release` is supported
 
 ## Usage
 API of KituraRequest should feel familiar as it closely maps the one of [Alamofire](https://github.com/Alamofire/Alamofire).
@@ -36,12 +36,12 @@ KituraRequest.request(method: .GET, "https://httpbin.org/get"]
 ```
 
 #### Request parameters and parameters encoding
-You can also create a request with parameters by passing `[String: AnyObject]` dictionary together with encoding method
+You can also create a request with parameters by passing `[[String: Any]]` dictionary together with encoding method
 
 ```swift
 KituraRequest.request(method: .POST,
                       "https://httpbin.org/post",
-                      parameters: ["foo":"bar"],
+                      parameters: [["foo":"bar"]],
                       encoding: .JSON)
 ```
 
