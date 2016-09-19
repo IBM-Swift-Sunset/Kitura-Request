@@ -24,34 +24,38 @@ public enum ParameterEncodingError: Swift.Error {
 }
 
 public enum ParameterEncoding {
+
+    public typealias EncodingHandler = (_ request: inout NSMutableURLRequest, _ parameters: Request.Parameters?) throws -> ()
+
     case url
     case json
     case multipart
-    case custom
+    case custom(EncodingHandler)
 
-    func encode(_ request: inout NSMutableURLRequest, parameters: [[String: Any]?]?) throws {
+    func encode(_ request: inout NSMutableURLRequest, parameters: Request.Parameters?) throws {
         guard let parameters = parameters, !parameters.isEmpty else {
             return
         }
 
         switch self {
         case .url:
-            try self.encodeInURL(request: &request, parameters: parameters as! [[String: Any]])
+            try self.encodeInURL(request: &request, parameters: parameters)
         case .json:
-            try self.encodeInJSON(request: &request, parameters: parameters as! [[String: Any]])
+            try self.encodeInJSON(request: &request, parameters: parameters)
         case .multipart:
-            try self.encodeInMultipart(request: &request, parameters: parameters as! [[String: Any]])
-        default:
-            throw RequestError.notImplemented
+            try self.encodeInMultipart(request: &request, parameters: parameters)
+        case .custom(let closure):
+            try closure(&request, parameters)
         }
     }
 
-    private func encodeInURL(request: inout NSMutableURLRequest, parameters: [[String: Any]]) throws {
-        guard let components = NSURLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
-            throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
+    private func encodeInURL(request: inout NSMutableURLRequest, parameters: Request.Parameters) throws {
+        guard let url = request.url,
+            let components = NSURLComponents(url: url, resolvingAgainstBaseURL: false) else {
+                throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
         }
 
-        components.query = ParameterEncoding.getQueryComponents(fromDictionary: parameters)
+        components.query = ParameterEncoding.getQuery(from: parameters)
 
         guard let newURL = components.url else {
             throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
@@ -60,20 +64,19 @@ public enum ParameterEncoding {
         request.url = newURL
     }
 
-    private func encodeInJSON(request: inout NSMutableURLRequest, parameters: [[String: Any]]) throws {
+    private func encodeInJSON(request: inout NSMutableURLRequest, parameters: Request.Parameters) throws {
         //for val in parameters {
-            let options = JSONSerialization.WritingOptions()
+        let options = JSONSerialization.WritingOptions()
         let data = parameters.count == 1 ?
             try JSONSerialization.data(withJSONObject: parameters[0], options: options) :
             try JSONSerialization.data(withJSONObject: parameters, options: options)
-            request.httpBody = data
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = data
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         //}
     }
 
-    private func encodeInMultipart(request: inout NSMutableURLRequest, parameters: [[String: Any]]) throws {
-        let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
-        let boundary = BodyBoundary(boundaryString)
+    private func encodeInMultipart(request: inout NSMutableURLRequest, parameters: Request.Parameters) throws {
+        let boundary = BodyBoundary()
 
         let parameters = ParameterEncoding.getComponents(from: parameters)
 
@@ -125,8 +128,9 @@ extension ParameterEncoding {
 
     typealias QueryComponents = [(String, String)]
     typealias BodyPartComponents = [(key: String, part: BodyPart)]
+    typealias Components = (query: QueryComponents, body: BodyPartComponents)
 
-    private static func getQueryComponent(_ key: String, _ value: Any) -> (query: QueryComponents, body: BodyPartComponents) {
+    private static func getQueryComponent(_ key: String, _ value: Any) -> Components {
         var queryComponents = QueryComponents()
         var bodyPartComponents = BodyPartComponents()
 
@@ -153,24 +157,22 @@ extension ParameterEncoding {
         return (queryComponents, bodyPartComponents)
     }
 
-    fileprivate static func getComponents(from array: [[String: Any]]) -> (query: QueryComponents, body: BodyPartComponents) {
-        var query = QueryComponents()
-        var body = BodyPartComponents()
+    fileprivate static func getComponents(from parameters: Request.Parameters) -> Components {
+        var components: Components = (QueryComponents(), BodyPartComponents())
 
-        for val in array {
-            for element in val {
-            let key = element.0
+        for dictionary in parameters {
+            components = dictionary.reduce(components) { value, element in
+                let key = element.0
                 let components = getQueryComponent(key, element.1)
-                query += components.query
-                body += components.body
+                return (value.query + components.query, value.body + components.body)
             }
         }
 
-        return (query, body)
+        return components
     }
 
-    fileprivate static func getQueryComponents(fromDictionary dict: [[String: Any]]) -> String {
-        let query = self.getComponents(from: dict).query
+    fileprivate static func getQuery(from parameters: Request.Parameters) -> String {
+        let query = self.getComponents(from: parameters).query
         return (query.map { "\($0)=\($1)" } as [String]).joined(separator: "&")
     }
 }

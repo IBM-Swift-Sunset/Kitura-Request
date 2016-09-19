@@ -18,10 +18,9 @@ import Foundation
 
 public class KituraRequest {
 
-
-  public static func request(_ method: RequestMethod,
+  public static func request(_ method: Request.Method,
                             _ URL: String,
-                            parameters: [[String: Any]?]? = nil,
+                            parameters: Request.Parameters? = nil,
                             encoding: ParameterEncoding = .url,
                             headers: [String: String]? = nil) -> Request {
 
