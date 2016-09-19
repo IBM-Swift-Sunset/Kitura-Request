@@ -29,24 +29,24 @@ public enum ParameterEncoding {
     case multipart
     case custom
 
-    func encode(_ request: inout NSMutableURLRequest, parameters: [String: Any]?) throws {
+    func encode(_ request: inout NSMutableURLRequest, parameters: [[String: Any]?]?) throws {
         guard let parameters = parameters, !parameters.isEmpty else {
             return
         }
 
         switch self {
         case .url:
-            try self.encodeInURL(request: &request, parameters: parameters)
+            try self.encodeInURL(request: &request, parameters: parameters as! [[String: Any]])
         case .json:
-            try self.encodeInJSON(request: &request, parameters: parameters)
+            try self.encodeInJSON(request: &request, parameters: parameters as! [[String: Any]])
         case .multipart:
-            try self.encodeInMultipart(request: &request, parameters: parameters)
+            try self.encodeInMultipart(request: &request, parameters: parameters as! [[String: Any]])
         default:
             throw RequestError.notImplemented
         }
     }
 
-    private func encodeInURL(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
+    private func encodeInURL(request: inout NSMutableURLRequest, parameters: [[String: Any]]) throws {
         guard let components = NSURLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
             throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
         }
@@ -60,14 +60,18 @@ public enum ParameterEncoding {
         request.url = newURL
     }
 
-    private func encodeInJSON(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
-        let options = JSONSerialization.WritingOptions()
-        let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
-        request.httpBody = data
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    private func encodeInJSON(request: inout NSMutableURLRequest, parameters: [[String: Any]]) throws {
+        //for val in parameters {
+            let options = JSONSerialization.WritingOptions()
+        let data = parameters.count == 1 ?
+            try JSONSerialization.data(withJSONObject: parameters[0], options: options) :
+            try JSONSerialization.data(withJSONObject: parameters, options: options)
+            request.httpBody = data
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        //}
     }
 
-    private func encodeInMultipart(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
+    private func encodeInMultipart(request: inout NSMutableURLRequest, parameters: [[String: Any]]) throws {
         let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
         let boundary = BodyBoundary(boundaryString)
 
@@ -149,21 +153,23 @@ extension ParameterEncoding {
         return (queryComponents, bodyPartComponents)
     }
 
-    fileprivate static  func getComponents(from dictionary: [String: Any]) -> (query: QueryComponents, body: BodyPartComponents) {
+    fileprivate static func getComponents(from array: [[String: Any]]) -> (query: QueryComponents, body: BodyPartComponents) {
         var query = QueryComponents()
         var body = BodyPartComponents()
 
-        for element in dictionary {
-	    let key = element.0
-            let components = getQueryComponent(key, element.1)
-            query += components.query
-            body += components.body
+        for val in array {
+            for element in val {
+            let key = element.0
+                let components = getQueryComponent(key, element.1)
+                query += components.query
+                body += components.body
+            }
         }
 
         return (query, body)
     }
 
-    fileprivate static func getQueryComponents(fromDictionary dict: [String: Any]) -> String {
+    fileprivate static func getQueryComponents(fromDictionary dict: [[String: Any]]) -> String {
         let query = self.getComponents(from: dict).query
         return (query.map { "\($0)=\($1)" } as [String]).joined(separator: "&")
     }
