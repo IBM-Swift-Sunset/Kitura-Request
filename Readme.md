@@ -36,7 +36,7 @@ KituraRequest.request(method: .GET, "https://httpbin.org/get"]
 ```
 
 #### Request parameters and parameters encoding
-You can also create a request with parameters by passing `[[String: Any]]` dictionary together with encoding method
+You can also create a request with parameters by passing `[[String: Any]]` array of dictionaries together with an encoding method:
 
 ```swift
 KituraRequest.request(method: .POST,
