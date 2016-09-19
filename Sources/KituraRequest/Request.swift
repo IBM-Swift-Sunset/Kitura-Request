@@ -14,9 +14,9 @@
  * limitations under the License.
  **/
 
-
 import Foundation
 import KituraNet
+import LoggerAPI
 
 public enum RequestMethod: String {
   case CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE
@@ -25,93 +25,97 @@ public enum RequestMethod: String {
 /// Wrapper around NSURLRequest
 /// TODO: Make an asynchronus version
 public class Request {
-  var request: ClientRequest?
-  var response: ClientResponse?
-  var data: Data?
-  var error: Swift.Error?
 
-  public typealias ResponseArguments = (request: ClientRequest?, response: ClientResponse?, data: Data?, error: Swift.Error?)
-  public typealias CompletionHandler = (ResponseArguments) -> Void
+    var request: ClientRequest?
+    var response: ClientResponse?
+    var data: NSData?
+    var error: Swift.Error?
 
-  public init(method: RequestMethod,
+    public typealias ResponseArguments = (request: ClientRequest?, response: ClientResponse?, data: Data?, error:Swift.Error?)
+    public typealias CompletionHandler = (ResponseArguments) -> Void
+
+    public init(method: RequestMethod,
              _ URL: String,
              parameters: [String: Any]? = nil,
              encoding: ParameterEncoding = .url,
              headers: [String: String]? = nil) {
 
-    do {
-      var options: [ClientRequest.Options] = []
-      options.append(.schema("")) // so that ClientRequest doesn't apend http
-      options.append(.method(method.rawValue)) // set method of request
+        do {
+            var options: [ClientRequest.Options] = []
+            options.append(.schema("")) // so that ClientRequest doesn't apend http
+            options.append(.method(method.rawValue)) // set method of request
 
-      // headers
-      if let headers = headers {
-        options.append(.headers(headers))
-      }
+            // headers
+            if let headers = headers {
+                options.append(.headers(headers))
+            }
 
-      var urlRequest = try formatURL(URL)
+            var urlRequest = try formatURL(URL)
 
-      try encoding.encode(&urlRequest, parameters: parameters)
+            try encoding.encode(&urlRequest, parameters: parameters)
 
-      options.append(.hostname(urlRequest.url!.absoluteString))
+            options.append(.hostname(urlRequest.url!.absoluteString))
 
+            if let headers = urlRequest.allHTTPHeaderFields {
+                options.append(.headers(headers))
+            }
 
-      // Create request
-      let request = HTTP.request(options) {
-        response in
-        self.response = response
-      }
+            // Create request
+            let request = HTTP.request(options) { response in
+                self.response = response
+            }
 
-      if let body = urlRequest.httpBody {
-        request.write(from: body)
-      }
+            if let body = urlRequest.httpBody {
+                request.write(from: body)
+            }
 
-      self.request = request
-    } catch {
-      self.request = nil
-      self.error = error
-    }
-  }
-
-  public func response(_ completionHandler: CompletionHandler) {
-    guard let response = response else {
-      completionHandler((request, nil, nil, error))
-      return
+            self.request = request
+        } catch {
+            self.request = nil
+            self.error = error
+        }
     }
 
-    var data = Data()
-    do {
-      _ = try response.read(into: &data)
-      completionHandler((request, response, data, error))
-    } catch {
-      print(error)
-    }
-  }
+    public func response(_ completionHandler: @escaping CompletionHandler) {
+        guard let response = response else {
+            completionHandler((request, nil, nil, error))
+            return
+        }
 
-  func submit() {
-    request?.end()
-  }
+        var data = Data()
+        do {
+            _ = try response.read(into: &data)
+            completionHandler((request, response, data, error))
+        } catch {
+            Log.error("Error in Kirutra-Request response: \(error)")
+        }
+    }
+
+    func submit() {
+        request?.end()
+    }
 }
 
 extension Request {
-  func formatURL(_ url: String) throws -> NSMutableURLRequest {
-    // Regex to test validity of url:
-    // _^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS
-    // also check RFC 1808
 
-    // or use NSURL:
-    guard let validURL = URL(string: url) else {
-      throw RequestError.invalidURL
+    func formatURL(_ url: String) throws -> NSMutableURLRequest {
+      // Regex to test validity of url:
+      // _^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS
+      // also check RFC 1808
+
+      // or use NSURL:
+      guard let validURL = URL(string: url) else {
+        throw RequestError.invalidURL
+      }
+
+      guard validURL.scheme != nil else {
+        throw RequestError.noSchemeProvided
+      }
+
+      guard validURL.host != nil else {
+        throw RequestError.noHostProvided
+      }
+
+      return NSMutableURLRequest(url: validURL)
     }
-
-    guard validURL.scheme != nil else {
-      throw RequestError.noSchemeProvided
-    }
-
-    guard validURL.host != nil else {
-      throw RequestError.noHostProvided
-    }
-
-    return NSMutableURLRequest(url: validURL)
-  }
 }

@@ -44,11 +44,45 @@ class RequestTests: XCTestCase {
       XCTFail()
     }
   }
+
+    func testMultipartRequest() {
+        KituraRequest.request(.GET,
+            "http://httpbin.org/image/png").response { _, _, data, error in
+                guard let data = data else {
+                    XCTFail("data should exits")
+                    return;
+                }
+
+                KituraRequest.request(.POST,
+                    "http://httpbin.org/post",
+                    parameters: [
+                        "key" : "value",
+                        "file" : BodyPart(data: data, mimeType: .image(.png), fileName: "image.jpg")
+                    ], encoding: .multipart).response { _, _, data, error in
+                        guard let string = dataToString(data) else {
+                            XCTFail("can't parse response")
+                            return
+                        }
+
+                        if !string.contains("\"file\": \"data:image/png;base64,") {
+                            XCTFail("file should exits in request")
+                        }
+
+                        if !string.contains("\"key\": \"value\"") {
+                            XCTFail("file should exits in request")
+                        }
+                }
+            }
+    }
 }
 
 extension RequestTests {
-  static var allTests: [(String, (RequestTests) -> () throws -> Void)] {
-    return [("testRequestAssignsClientRequestURL", testRequestAssignsClientRequestURL),
-    ("testRequestAssignClientRequestMethod", testRequestAssignClientRequestMethod)]
+  static var allTests : [(String, (RequestTests) -> () throws -> Void)] {
+    return [
+        ("testRequestAssignsClientRequestURL", testRequestAssignsClientRequestURL),
+        ("testRequestAssignClientRequestMethod", testRequestAssignClientRequestMethod),
+        ("testRequestAssignsClientRequestHeaders", testRequestAssignsClientRequestHeaders),
+        ("testMultipartRequest", testMultipartRequest)
+    ]
   }
 }

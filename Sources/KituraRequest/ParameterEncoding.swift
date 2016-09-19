@@ -16,102 +16,155 @@
  **/
 
 import Foundation
-import Bridging
 
 public enum ParameterEncodingError: Swift.Error {
-  case couldNotCreateComponentsFromURL
-  case couldNotCreateURLFromComponents
+    case couldNotCreateComponentsFromURL
+    case couldNotCreateURLFromComponents
+    case couldNotCreateMultipart
 }
 
 public enum ParameterEncoding {
-  case url
-  case json
-  case custom
+    case url
+    case json
+    case multipart
+    case custom
 
-  func encode( _ request: inout NSMutableURLRequest, parameters: [String: Any]?) throws {
+    func encode(_ request: inout NSMutableURLRequest, parameters: [String: Any]?) throws {
+        guard let parameters = parameters, !parameters.isEmpty else {
+            return
+        }
 
-    guard let parameters = parameters, !parameters.isEmpty else {
-      return
+        switch self {
+        case .url:
+            try self.encodeInURL(request: &request, parameters: parameters)
+        case .json:
+            try self.encodeInJSON(request: &request, parameters: parameters)
+        case .multipart:
+            try self.encodeInMultipart(request: &request, parameters: parameters)
+        default:
+            throw RequestError.notImplemented
+        }
     }
 
-    switch self {
-    case .url:
-      guard var components = URLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
-        throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
-      }
+    private func encodeInURL(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
+        guard let components = NSURLComponents(url: request.url!, resolvingAgainstBaseURL: false) else {
+            throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
+        }
 
-      components.query = getQueryComponents(fromDictionary: parameters)
+        components.query = ParameterEncoding.getQueryComponents(fromDictionary: parameters)
 
-      guard let newURL = components.url else {
-        throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
-      }
-      request.url = newURL
+        guard let newURL = components.url else {
+            throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
+        }
 
-    case .json:
-      let options = JSONSerialization.WritingOptions()
-      // need to convert to NSDictionary as Dictionary(struct) is not AnyObject(instance of class only)
-      #if os(Linux)
-        let safe_parameters = parameters._bridgeToAnyObject() // don't try to print!!!
-      #else
-        let safe_parameters = parameters as NSDictionary
-      #endif
-      let data = try JSONSerialization.data(withJSONObject: safe_parameters, options: options)
-      request.httpBody = data
-      // set content type to application/json
-      request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    default:
-      throw RequestError.notImplemented
+        request.url = newURL
     }
-  }
+
+    private func encodeInJSON(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
+        let options = JSONSerialization.WritingOptions()
+        let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
+        request.httpBody = data
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    }
+
+    private func encodeInMultipart(request: inout NSMutableURLRequest, parameters: [String: Any]) throws {
+        let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
+        let boundary = BodyBoundary(boundaryString)
+
+        let parameters = ParameterEncoding.getComponents(from: parameters)
+
+        var bodyParameters = parameters.query.flatMap { item -> (key: String, part: BodyPart)? in
+            let key = item.0
+            let value = item.1
+
+            guard let returnValue = BodyPart(value) else {
+                return nil
+            }
+            return (key, returnValue)
+        }
+
+        bodyParameters += parameters.body
+
+        var httpBody = Data()
+
+        for (index, bodyPart) in bodyParameters.enumerated() {
+            let bodyBoundary: Data
+
+            if index == 0,
+                let initial = boundary.initial {
+                    bodyBoundary = initial
+            } else if index != 0,
+                let encapsulated = boundary.encapsulated {
+                    bodyBoundary = encapsulated
+            } else {
+                throw ParameterEncodingError.couldNotCreateMultipart
+            }
+
+            httpBody.append(bodyBoundary)
+
+            let parameterBody = try bodyPart.part.content(for: bodyPart.key)
+            httpBody.append(parameterBody)
+        }
+
+        guard let final = boundary.final else {
+            throw ParameterEncodingError.couldNotCreateMultipart
+        }
+
+        httpBody.append(final)
+
+        request.httpBody = httpBody
+        request.setValue("multipart/form-data; boundary=\(boundary.value)", forHTTPHeaderField: "Content-Type")
+    }
 }
 
 extension ParameterEncoding {
-  typealias QueryComponents = [(String, String)]
 
-  fileprivate func getQueryComponent(_ key: String, _ value: Any) -> QueryComponents {
-    var queryComponents: QueryComponents = []
+    typealias QueryComponents = [(String, String)]
+    typealias BodyPartComponents = [(key: String, part: BodyPart)]
 
-    switch value {
-    case let d as [String: Any]:
-      for (k, v) in d {
-        queryComponents += getQueryComponent("\(key)[\(k)]", v)
-      }
-    case let d as NSDictionary:
-    #if os(Linux)
-      let convertedD = d._bridgeToSwift() // [NSObject : AnyObject]
-      for (k, v) in convertedD {
-        if let kk = k as? NSString {
-          queryComponents += getQueryComponent("\(key)[\(kk._bridgeToSwift()))]", v)
-        } // else consider throw or something
-      }
-    #else
-      break
-    #endif
-    case let a as [AnyObject]:
-      for value in a {
-        queryComponents += getQueryComponent(key + "[]", value)
-      }
+    private static func getQueryComponent(_ key: String, _ value: Any) -> (query: QueryComponents, body: BodyPartComponents) {
+        var queryComponents = QueryComponents()
+        var bodyPartComponents = BodyPartComponents()
 
-    case let a as NSArray:
-    #if os(Linux)
-      for value in a._bridgeToSwift() {
-        queryComponents += getQueryComponent(key + "[]", value)
-      }
-    #else
-      break
-    #endif
-    default:
-      queryComponents.append((key, "\(value)"))
+        switch value {
+        case let bodyPart as BodyPart:
+            bodyPartComponents += [(key: key, part: bodyPart)]
+            break
+        case let dictionary as [String: Any]:
+            for (valueKey, value) in dictionary {
+                let components = getQueryComponent("\(key)[\(valueKey)]", value)
+                queryComponents += components.query
+                bodyPartComponents += components.body
+            }
+        case let array as [Any]:
+              for value in array {
+                let components = getQueryComponent(key + "[]", value)
+                queryComponents += components.query
+                bodyPartComponents += components.body
+              }
+        default:
+            queryComponents.append((key, "\(value)"))
+        }
+
+        return (queryComponents, bodyPartComponents)
     }
-    return queryComponents
-  }
 
-  func getQueryComponents(fromDictionary dict: [String: Any]) -> String {
-    var query: [(String, String)] = []
+    fileprivate static  func getComponents(from dictionary: [String: Any]) -> (query: QueryComponents, body: BodyPartComponents) {
+        var query = QueryComponents()
+        var body = BodyPartComponents()
 
-    for element in dict {
-      query += getQueryComponent(element.0, element.1)
+        for element in dictionary {
+	    let key = element.0
+            let components = getQueryComponent(key, element.1)
+            query += components.query
+            body += components.body
+        }
+
+        return (query, body)
     }
-    return (query.map { "\($0)=\($1)" } as [String]).joined(separator: "&")
-  }
+
+    fileprivate static func getQueryComponents(fromDictionary dict: [String: Any]) -> String {
+        let query = self.getComponents(from: dict).query
+        return (query.map { "\($0)=\($1)" } as [String]).joined(separator: "&")
+    }
 }
