@@ -21,7 +21,7 @@ public class KituraRequest {
   public static func request(_ method: Request.Method,
                             _ URL: String,
                             parameters: Request.Parameters? = nil,
-                            encoding: ParameterEncoding = .url,
+                            encoding: Encoding = URLEncoding.default,
                             headers: [String: String]? = nil) -> Request {
 
     let request =  Request(method: method,

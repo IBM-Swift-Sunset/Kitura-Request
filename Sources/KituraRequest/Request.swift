@@ -39,7 +39,7 @@ public class Request {
     public init(method: Method,
              _ URL: String,
              parameters: Parameters? = nil,
-             encoding: ParameterEncoding = .url,
+             encoding: Encoding = URLEncoding.default,
              headers: [String: String]? = nil) {
 
         do {
@@ -47,16 +47,16 @@ public class Request {
             options.append(.schema("")) // so that ClientRequest doesn't apend http
             options.append(.method(method.rawValue)) // set method of request
 
-            // headers
-            if let headers = headers {
-                options.append(.headers(headers))
-            }
-
             var urlRequest = try formatURL(URL)
 
             try encoding.encode(&urlRequest, parameters: parameters)
 
             options.append(.hostname(urlRequest.url!.absoluteString))
+
+            // headers
+            if let headers = headers {
+                options.append(.headers(headers))
+            }
 
             if let headers = urlRequest.allHTTPHeaderFields {
                 options.append(.headers(headers))
