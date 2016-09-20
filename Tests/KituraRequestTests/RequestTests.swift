@@ -25,7 +25,6 @@ class RequestTests: XCTestCase {
   var testRequest = KituraRequest.request(.POST,
                                           "https://google.com",
                                           parameters: [["asd":"asd"]],
-                                          encoding: .url,
                                           headers: ["User-Agent":"Kitura-Server"]
   )
 
@@ -56,9 +55,10 @@ class RequestTests: XCTestCase {
                 KituraRequest.request(.POST,
                     "http://httpbin.org/post",
                     parameters: [[
-                        "key" : "value",
-                        "file" : BodyPart(data: data, mimeType: .image(.png), fileName: "image.jpg")
-                    ]], encoding: .multipart).response { _, _, data, error in
+                        "key" : "value"
+                    ]], encoding: MultipartEncoding([
+                        BodyPart(key: "file", data: data, mimeType: .image(.png), fileName: "image.jpg")
+                    ])).response { _, _, data, error in
                         guard let string = dataToString(data) else {
                             XCTFail("can't parse response")
                             return
