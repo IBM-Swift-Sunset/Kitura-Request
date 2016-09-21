@@ -47,10 +47,11 @@ KituraRequest.request(.POST,
 ```
 
 Currently `URLEncoding`, `JSONEncoding` and `MultipartEncoding` encodings is supported by default.
-`URLEncoding` encodes parameters as URLs query.
-`JSONEncoding` converts parameters dictionary to JSON and appends it to request's body.
-`MultipartEncoding` generates multipart http body from passed parameters and appends it to request's body.
-When encoding parameters as `JSONEncoding` or `MultipartEncoding` appropriate Content-Type header is set.
+
+`URLEncoding` encodes parameters as URLs query.  
+`JSONEncoding` converts parameters dictionary to JSON and appends it to request's body.  
+`MultipartEncoding` generates multipart http body from passed parameters and appends it to request's body.  
+When encoding parameters as `JSONEncoding` or `MultipartEncoding` appropriate Content-Type header is set.  
 To create custom parameter encoding extend any class or struct with `Encoding` protocol.
 
 
