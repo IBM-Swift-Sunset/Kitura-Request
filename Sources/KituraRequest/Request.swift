@@ -18,9 +18,6 @@ import Foundation
 import KituraNet
 import LoggerAPI
 
-public enum RequestMethod: String {
-  case CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE
-}
 
 /// Wrapper around NSURLRequest
 /// TODO: Make an asynchronus version
@@ -31,13 +28,18 @@ public class Request {
     var data: NSData?
     var error: Swift.Error?
 
-    public typealias ResponseArguments = (request: ClientRequest?, response: ClientResponse?, data: Data?, error:Swift.Error?)
-    public typealias CompletionHandler = (ResponseArguments) -> Void
+    public typealias Parameters = [[String : Any]]
 
-    public init(method: RequestMethod,
+    public enum Method: String {
+        case CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE
+    }
+
+    public typealias CompletionHandler = (_ request: ClientRequest?, _ response: ClientResponse?, _ data: Data?, _ error: Swift.Error?) -> Void
+
+    public init(method: Method,
              _ URL: String,
-             parameters: [[String: Any]?]? = nil,
-             encoding: ParameterEncoding = .url,
+             parameters: Parameters? = nil,
+             encoding: Encoding = URLEncoding.default,
              headers: [String: String]? = nil) {
 
         do {
@@ -45,16 +47,16 @@ public class Request {
             options.append(.schema("")) // so that ClientRequest doesn't apend http
             options.append(.method(method.rawValue)) // set method of request
 
-            // headers
-            if let headers = headers {
-                options.append(.headers(headers))
-            }
-
             var urlRequest = try formatURL(URL)
 
             try encoding.encode(&urlRequest, parameters: parameters)
 
             options.append(.hostname(urlRequest.url!.absoluteString))
+
+            // headers
+            if let headers = headers {
+                options.append(.headers(headers))
+            }
 
             if let headers = urlRequest.allHTTPHeaderFields {
                 options.append(.headers(headers))
@@ -78,14 +80,14 @@ public class Request {
 
     public func response(_ completionHandler: @escaping CompletionHandler) {
         guard let response = response else {
-            completionHandler((request, nil, nil, error))
+            completionHandler(request, nil, nil, error)
             return
         }
 
         var data = Data()
         do {
             _ = try response.read(into: &data)
-            completionHandler((request, response, data, error))
+            completionHandler(request, response, data, error)
         } catch {
             Log.error("Error in Kirutra-Request response: \(error)")
         }

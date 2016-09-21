@@ -44,28 +44,31 @@ public struct BodyPart {
         }
     }
 
+    private(set) var key: String
     private(set) var data: Data
     private(set) var mimeType: MimeType
     private(set) var fileName: String?
 
-    public init?(_ object: Any) {
-        let string = String(describing: object)
+    public init?(key: String, value: Any) {
+        let string = String(describing: value)
         guard let data = string.data(using: .utf8, allowLossyConversion: false) else {
             return nil
         }
 
+        self.key = key
         self.data = data
         self.mimeType = .none
     }
 
-    public init(data: Data, mimeType: MimeType = .none, fileName: String? = nil) {
+    public init(key: String, data: Data, mimeType: MimeType = .none, fileName: String? = nil) {
+        self.key = key
         self.data = data
         self.mimeType = mimeType
         self.fileName = fileName
     }
 
-    private func header(for key: String) -> String {
-        var header = "Content-Disposition: form-data; name=\(key)"
+    private var header: String {
+        var header = "Content-Disposition: form-data; name=\(self.key)"
 
         if let fileName = self.fileName {
             header += "; filename=\(fileName)"
@@ -80,9 +83,9 @@ public struct BodyPart {
         return header
     }
 
-    public func content(for key: String) throws -> Data {
+    public func content() throws -> Data {
         var result = Data()
-        let headerString = self.header(for: key)
+        let headerString = self.header
         guard let header = headerString.data(using: .utf8, allowLossyConversion: false) else {
             throw ParameterEncodingError.couldNotCreateMultipart
         }

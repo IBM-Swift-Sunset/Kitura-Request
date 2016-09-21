@@ -7,14 +7,15 @@ A module for sending HTTP requests in [IBM Kitura](https://github.com/IBM-Swift/
 
 TODO:
 - [x] !! Add URL parameter encoding
-- [x] !! Add JSON parameter encoding 
+- [x] !! Add JSON parameter encoding
+- [x] !! Multipart form data parameter encoding
 - [x] !! Make tests run on Linux
 - [x] !! Write tests to check if resulting ClientRequest is properly initialised
 - [x] Add synchronus interface
 - [ ] Add async interface
 - [x] Write instructions
 - [x] Switch back to depend on IBM Kitura-net
- 
+
 
 ## Installation
 To install KituraRequest add following line to Dependencies in `Package.json`:
@@ -32,14 +33,14 @@ API of KituraRequest should feel familiar as it closely maps the one of [Alamofi
 To create a request object simply call
 
 ```swift
-KituraRequest.request(method: .GET, "https://httpbin.org/get"]
+KituraRequest.request(.GET, "https://httpbin.org/get"]
 ```
 
 #### Request parameters and parameters encoding
 You can also create a request with parameters by passing `[[String: Any]]` array of dictionaries together with an encoding method:
 
 ```swift
-KituraRequest.request(method: .POST,
+KituraRequest.request(.POST,
                       "https://httpbin.org/post",
                       parameters: [["foo":"bar"]],
                       encoding: .JSON)
@@ -52,7 +53,7 @@ Currently `.URL` and `.JSON` encoding is supported. `.URL` encodes parameters as
 To set headers in the request pass them as `[String: String]` dictionary as shown below:
 
 ```swift
-KituraRequest.request(method: .GET,
+KituraRequest.request(.GET,
                       "https://httpbin.org/get",
                       headers: ["User-Agent":"Awesome-App"])
 ```
@@ -61,7 +62,7 @@ KituraRequest.request(method: .GET,
 Currently there is only one method that you can call to get back the requests response and it returns `NSData`.
 
 ```swift
-KituraRequest.request(method: .GET, "https://google.com"].response {
+KituraRequest.request(.GET, "https://google.com"].response {
   request, response, data, error in
   // do something with data
 }
