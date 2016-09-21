@@ -53,14 +53,10 @@ extension Encoding {
     }
 
     static func getComponents(from parameters: Request.Parameters) -> Components {
-        var components = Components()
-
-        for dictionary in parameters {
-            components = dictionary.reduce(components) { value, element in
-                let key = element.0
-                let components = self.getComponents(key, element.1)
-                return value + components
-            }
+        let components = parameters.reduce(Components()) { value, element in
+            let key = element.0
+            let components = self.getComponents(key, element.1)
+            return value + components
         }
 
         return components

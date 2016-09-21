@@ -24,7 +24,7 @@ class RequestTests: XCTestCase {
 
   var testRequest = KituraRequest.request(.POST,
                                           "https://google.com",
-                                          parameters: [["asd":"asd"]],
+                                          parameters: ["asd":"asd"],
                                           headers: ["User-Agent":"Kitura-Server"]
   )
 
@@ -49,14 +49,14 @@ class RequestTests: XCTestCase {
             "http://httpbin.org/image/png").response { _, _, data, error in
                 guard let data = data else {
                     XCTFail("data should exits")
-                    return;
+                    return
                 }
 
                 KituraRequest.request(.POST,
                     "http://httpbin.org/post",
-                    parameters: [[
+                    parameters: [
                         "key" : "value"
-                    ]], encoding: MultipartEncoding([
+                    ], encoding: MultipartEncoding([
                         BodyPart(key: "file", data: data, mimeType: .image(.png), fileName: "image.jpg")
                     ])).response { _, _, data, error in
                         guard let string = dataToString(data) else {
@@ -64,13 +64,9 @@ class RequestTests: XCTestCase {
                             return
                         }
 
-                        if !string.contains("\"file\": \"data:image/png;base64,") {
-                            XCTFail("file should exits in request")
-                        }
+                        XCTAssertTrue(string.contains("\"file\": \"data:image/png;base64,"), "file should exits in request")
 
-                        if !string.contains("\"key\": \"value\"") {
-                            XCTFail("file should exits in request")
-                        }
+                        XCTAssertTrue(string.contains("\"key\": \"value\""), "key value should exits in request")
                 }
             }
     }

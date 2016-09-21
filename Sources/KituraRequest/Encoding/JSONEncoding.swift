@@ -27,9 +27,7 @@ public struct JSONEncoding: Encoding {
         guard let parameters = parameters, !parameters.isEmpty else { return }
 
         let options = JSONSerialization.WritingOptions()
-        let data = parameters.count == 1 ?
-            try JSONSerialization.data(withJSONObject: parameters[0], options: options) :
-            try JSONSerialization.data(withJSONObject: parameters, options: options)
+        let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
         request.httpBody = data
     }
 }
