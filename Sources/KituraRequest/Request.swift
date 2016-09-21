@@ -15,16 +15,15 @@
  **/
 
 import Foundation
-import KituraNet
-import LoggerAPI
 
 
 /// Wrapper around NSURLRequest
 /// TODO: Make an asynchronus version
-public class Request {
+public class Request{
 
-    var request: ClientRequest?
-    var response: ClientResponse?
+    var request: URLRequest?
+    var response: URLResponse?
+    var session: URLSession?
     var data: NSData?
     var error: Swift.Error?
 
@@ -40,35 +39,37 @@ public class Request {
              _ URL: String,
              parameters: Parameters? = nil,
              encoding: Encoding = URLEncoding.default,
+
              headers: [String: String]? = nil) {
 
         do {
-            var options: [ClientRequest.Options] = []
-            options.append(.schema("")) // so that ClientRequest doesn't apend http
-            options.append(.method(method.rawValue)) // set method of request
-
-            var urlRequest = try formatURL(URL)
-
+            var urlRequest = try formatURL(url)
             try encoding.encode(&urlRequest, parameters: parameters)
+            var request: URLRequest? = URLRequest(url: urlRequest.url!)
+            //options.append(.schema("")) // so that ClientRequest doesn't apend http
+            request?.addValue("", forHTTPHeaderField: "schema")
+            //options.append(.method(method.rawValue)) // set method of request
+            request?.httpMethod = method.rawValue
 
-            options.append(.hostname(urlRequest.url!.absoluteString))
 
             // headers
             if let headers = headers {
-                options.append(.headers(headers))
+                //options.append(.allHTTPHeaderFields(headers))
+                //options?.addValue(headers, forHTTPHeaderField: "headers")
+                request?.allHTTPHeaderFields = headers
             }
 
-            if let headers = urlRequest.allHTTPHeaderFields {
-                options.append(.headers(headers))
-            }
+            //if let headers = urlRequest.allHTTPHeaderFields {
+                //options.append(.headers(headers))
+            //}
 
-            // Create request
-            let request = HTTP.request(options) { response in
-                self.response = response
-            }
 
+            //self.response = URLResponse(url: URL(string: url)!, mimeType: "", expectedContentLength: -1, textEncodingName: nil)
+            
+            
             if let body = urlRequest.httpBody {
-                request.write(from: body)
+                request?.httpBody = body
+                //request.write(from: body)
             }
 
             self.request = request
@@ -79,28 +80,45 @@ public class Request {
     }
 
     public func response(_ completionHandler: @escaping CompletionHandler) {
-        guard let response = response else {
-            completionHandler(request, nil, nil, error)
+
+        /*guard self.response != nil else {
+            completionHandler((request, nil, nil, error))
             return
+        }*/
+
+        
+        var configuration = URLSessionConfiguration()
+        configuration = .default
+        configuration.urlCache = nil
+        
+        session = URLSession(configuration: configuration)
+        let result = session?.dataTask(with: self.request!) {
+            (data: Data?, response: URLResponse?, error: Error?) in
+            if let error = error {
+                completionHandler((self.request, nil, nil, error))
+            }
+            completionHandler((self.request, response, data, error))
         }
 
-        var data = Data()
-        do {
-            _ = try response.read(into: &data)
-            completionHandler(request, response, data, error)
-        } catch {
-            Log.error("Error in Kirutra-Request response: \(error)")
-        }
+        result?.resume()
+        
+//        do {
+//            _ = try read(&data)
+//            completionHandler((request, response, data, error))
+//        } catch {
+//            print("Error in Kitura-Request response: \(error)")
+//        }
+
     }
 
-    func submit() {
+    /*func submit() {
         request?.end()
-    }
+    }*/
 }
 
 extension Request {
 
-    func formatURL(_ url: String) throws -> NSMutableURLRequest {
+    func formatURL(_ url: String) throws -> URLRequest {
       // Regex to test validity of url:
       // _^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS
       // also check RFC 1808
@@ -118,6 +136,6 @@ extension Request {
         throw RequestError.noHostProvided
       }
 
-      return NSMutableURLRequest(url: validURL)
+      return URLRequest(url: validURL)
     }
 }

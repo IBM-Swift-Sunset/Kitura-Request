@@ -16,7 +16,6 @@
 
 import XCTest
 import Foundation
-import KituraNet
 
 @testable import KituraRequest
 
@@ -29,15 +28,15 @@ class RequestTests: XCTestCase {
   )
 
   func testRequestAssignsClientRequestURL() {
-    XCTAssertEqual(testRequest.request?.url, "https://google.com?asd=asd")
+    XCTAssertEqual(testRequest.request?.url, URL(string: "https://google.com?asd=asd"))
   }
 
   func testRequestAssignClientRequestMethod() {
-    XCTAssertEqual(testRequest.request?.method, "POST")
+    XCTAssertEqual(testRequest.request?.httpMethod, "POST")
   }
 
   func testRequestAssignsClientRequestHeaders() {
-    if let headers = testRequest.request?.headers {
+    if let headers = testRequest.request?.allHTTPHeaderFields {
       XCTAssertEqual(headers["User-Agent"], "Kitura-Server")
     } else {
       XCTFail()
@@ -45,11 +44,13 @@ class RequestTests: XCTestCase {
   }
 
     func testMultipartRequest() {
+        let expectation1 = expectation(description: "multipart test")
         KituraRequest.request(.GET,
             "http://httpbin.org/image/png").response { _, _, data, error in
                 guard let data = data else {
-                    XCTFail("data should exits")
-                    return
+                    XCTFail("Data should exist")
+                    expectation1.fulfill()
+                    return;
                 }
 
                 KituraRequest.request(.POST,
@@ -59,15 +60,20 @@ class RequestTests: XCTestCase {
                     ], encoding: MultipartEncoding([
                         BodyPart(key: "file", data: data, mimeType: .image(.png), fileName: "image.jpg")
                     ])).response { _, _, data, error in
+
                         guard let string = dataToString(data) else {
-                            XCTFail("can't parse response")
+                            XCTFail("Can't parse response")
+                            expectation1.fulfill()
                             return
                         }
 
                         XCTAssertTrue(string.contains("\"file\": \"data:image/png;base64,"), "file should exits in request")
                         XCTAssertTrue(string.contains("\"key\": \"value\""), "key value should exits in request")
+
+                        expectation1.fulfill()
                 }
             }
+        waitForExpectations(timeout: 5)
     }
 }
 

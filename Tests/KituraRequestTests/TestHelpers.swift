@@ -15,7 +15,6 @@
  **/
 
 import Foundation
-import KituraNet
 
 func dataToString(_ data: Data?) -> String? {
   return data != nil ? String(data: data!, encoding: .utf8) : nil

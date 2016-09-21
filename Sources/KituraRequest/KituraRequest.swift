@@ -18,10 +18,18 @@ import Foundation
 
 public class KituraRequest {
 
+<<<<<<< 24cfb806ff7933f43c9afef4cd4ae235d0022bc1
   public static func request(_ method: Request.Method,
                             _ URL: String,
                             parameters: Request.Parameters? = nil,
                             encoding: Encoding = URLEncoding.default,
+=======
+
+  public static func request(_ method: RequestMethod,
+                             _ URL: String,
+                            parameters: [[String: Any]?]? = nil,
+                            encoding: ParameterEncoding = .url,
+>>>>>>> Using urlsession
                             headers: [String: String]? = nil) -> Request {
 
     let request =  Request(method: method,
@@ -29,7 +37,9 @@ public class KituraRequest {
                            parameters: parameters,
                            encoding: encoding,
                            headers: headers)
-    request.submit()
+    
+    //let request = URLRequest(url: URL(string: url)!)
+    //request.submit()
     return request
   }
 }
