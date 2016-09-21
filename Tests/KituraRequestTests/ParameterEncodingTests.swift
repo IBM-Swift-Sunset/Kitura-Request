@@ -37,7 +37,7 @@ class ParameterEncodingTests: XCTestCase {
   func testJSONParameterEncodingWhenEmptyPassed() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try JSONEncoding.default.encode(&urlRequest, parameters: [])
+        try JSONEncoding.default.encode(&urlRequest, parameters: [:])
         XCTAssertNil(urlRequest.httpBody)
     } catch {
       XCTFail()
@@ -47,7 +47,7 @@ class ParameterEncodingTests: XCTestCase {
   func testJSONParameterEncodingSetsHeaders() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try JSONEncoding.default.encode(&urlRequest, parameters: [["p1":1]])
+        try JSONEncoding.default.encode(&urlRequest, parameters: ["p1":1])
         XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Content-Type"), "application/json")
     } catch {
       XCTFail()
@@ -57,7 +57,7 @@ class ParameterEncodingTests: XCTestCase {
   func testJSONParametersEncodingSetsBody() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try JSONEncoding.default.encode(&urlRequest, parameters: [["p1":1]])
+        try JSONEncoding.default.encode(&urlRequest, parameters: ["p1":1])
         let body = dataToString(urlRequest.httpBody)
         XCTAssertEqual(body, "{\"p1\":1}")
     } catch {
@@ -67,7 +67,7 @@ class ParameterEncodingTests: XCTestCase {
     func testJSONParametersEncodingSetsBodyWithArray() {
         var urlRequest = NSMutableURLRequest(url: url)
         do {
-            try JSONEncoding.default.encode(&urlRequest, parameters: [["p1":[1,2]]])
+            try JSONEncoding.default.encode(&urlRequest, parameters: ["p1":[1,2]])
             let body = dataToString(urlRequest.httpBody)
             XCTAssertEqual(body, "{\"p1\":[1,2]}")
         } catch {
@@ -78,9 +78,13 @@ class ParameterEncodingTests: XCTestCase {
     func testJSONArrayParametersEncodingSetsBody() {
         var urlRequest = NSMutableURLRequest(url: url)
         do {
-            try JSONEncoding.default.encode(&urlRequest, parameters: [["p1":1], ["p2": 2]])
-            let body = dataToString(urlRequest.httpBody)
-            XCTAssertEqual(body, "[{\"p1\":1},{\"p2\":2}]")
+            try JSONEncoding.default.encode(&urlRequest, parameters: ["p1":1, "p2": 2])
+            guard let body = dataToString(urlRequest.httpBody) else {
+                XCTFail("should have a body")
+                return
+            }
+            XCTAssertTrue(body.contains("\"p1\":1"), "json encoding error")
+            XCTAssertTrue(body.contains("\"p2\":2"), "json encoding error")
         } catch {
             XCTFail()
         }
@@ -101,7 +105,7 @@ class ParameterEncodingTests: XCTestCase {
   func testURLParametersEncodingWithEmptyParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try URLEncoding.default.encode(&urlRequest, parameters: [])
+        try URLEncoding.default.encode(&urlRequest, parameters: [:])
         XCTAssertEqual(urlRequest.url?.absoluteString, url.absoluteString)
     } catch {
       XCTFail()
@@ -111,8 +115,13 @@ class ParameterEncodingTests: XCTestCase {
   func testURLParametersEncodingWithSimpleParameters() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try URLEncoding.default.encode(&urlRequest, parameters: [["a":1], ["b":2]])
-        XCTAssertEqual(urlRequest.url?.query, "a=1&b=2") // this may be brittle
+        try URLEncoding.default.encode(&urlRequest, parameters: ["a":1, "b":2])
+        guard let query = urlRequest.url?.query else {
+            XCTFail("should have a body")
+            return
+        }
+        XCTAssertTrue(query.contains("a=1"), "url encoding error")
+        XCTAssertTrue(query.contains("b=2"), "url encoding error")
     } catch {
       XCTFail()
     }
@@ -121,7 +130,7 @@ class ParameterEncodingTests: XCTestCase {
   func testURLParametersEncodingWithArray() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try URLEncoding.default.encode(&urlRequest, parameters: [["a":[1, 2]]])
+        try URLEncoding.default.encode(&urlRequest, parameters: ["a":[1, 2]])
         XCTAssertEqual(urlRequest.url?.query, "a%5B%5D=1&a%5B%5D=2") // this may be brittle
     } catch {
       XCTFail()
@@ -131,7 +140,7 @@ class ParameterEncodingTests: XCTestCase {
   func testURLParametersEncodingWithDictionary() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try URLEncoding.default.encode(&urlRequest, parameters: [["a" : ["b" : 1]]])
+        try URLEncoding.default.encode(&urlRequest, parameters: ["a" : ["b" : 1]])
         XCTAssertEqual(urlRequest.url?.query, "a%5Bb%5D=1") // this may be brittle
     } catch {
       XCTFail()
@@ -141,7 +150,7 @@ class ParameterEncodingTests: XCTestCase {
   func testURLParametersEncodingWithArrayNestedInDict() {
     var urlRequest = NSMutableURLRequest(url: url)
     do {
-        try URLEncoding.default.encode(&urlRequest, parameters: [["a" : ["b" : [1, 2]]]])
+        try URLEncoding.default.encode(&urlRequest, parameters: ["a" : ["b" : [1, 2]]])
         XCTAssertEqual(urlRequest.url?.query, "a%5Bb%5D%5B%5D=1&a%5Bb%5D%5B%5D=2") // this may be brittle
     } catch {
       XCTFail()

@@ -37,16 +37,22 @@ KituraRequest.request(.GET, "https://httpbin.org/get"]
 ```
 
 #### Request parameters and parameters encoding
-You can also create a request with parameters by passing `[[String: Any]]` array of dictionaries together with an encoding method:
+You can also create a request with parameters by passing `[String: Any]` dictionary together with an encoding method:
 
 ```swift
 KituraRequest.request(.POST,
                       "https://httpbin.org/post",
-                      parameters: [["foo":"bar"]],
-                      encoding: .JSON)
+                      parameters: ["foo":"bar"],
+                      encoding: JSONEncoding.default)
 ```
 
-Currently `.URL` and `.JSON` encoding is supported. `.URL` encodes parameters as URLs query while the latter converts parameters dictionary to JSON and appends it to request's body. When encoding parameters as `.JSON` appropriate Content-Type header is set.
+Currently `URLEncoding`, `JSONEncoding` and `MultipartEncoding` encodings is supported by default.
+
+`URLEncoding` encodes parameters as URLs query.  
+`JSONEncoding` converts parameters dictionary to JSON and appends it to request's body.  
+`MultipartEncoding` generates multipart http body from passed parameters and appends it to request's body.  
+When encoding parameters as `JSONEncoding` or `MultipartEncoding` appropriate Content-Type header is set.  
+To create custom parameter encoding extend any class or struct with `Encoding` protocol.
 
 
 #### Headers

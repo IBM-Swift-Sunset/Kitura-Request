@@ -28,7 +28,7 @@ public class Request {
     var data: NSData?
     var error: Swift.Error?
 
-    public typealias Parameters = [[String : Any]]
+    public typealias Parameters = [String : Any]
 
     public enum Method: String {
         case CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE

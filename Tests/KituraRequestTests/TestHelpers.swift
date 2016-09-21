@@ -17,6 +17,6 @@
 import Foundation
 import KituraNet
 
-func dataToString(_ data: Data?) -> NSString? {
-  return data != nil ? NSString(data: data!, encoding: String.Encoding.utf8.rawValue) : nil
+func dataToString(_ data: Data?) -> String? {
+  return data != nil ? String(data: data!, encoding: .utf8) : nil
 }
