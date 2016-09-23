@@ -33,59 +33,42 @@ public class Request{
         case CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE
     }
 
-    public typealias CompletionHandler = (_ request: ClientRequest?, _ response: ClientResponse?, _ data: Data?, _ error: Swift.Error?) -> Void
+    public typealias CompletionHandler = (_ request: URLRequest?, _ response: URLResponse?, _ data: Data?, _ error: Swift.Error?) -> Void
 
     public init(method: Method,
-             _ URL: String,
+             _ url: String,
              parameters: Parameters? = nil,
              encoding: Encoding = URLEncoding.default,
-
              headers: [String: String]? = nil) {
 
         do {
             var urlRequest = try formatURL(url)
             try encoding.encode(&urlRequest, parameters: parameters)
             var request: URLRequest? = URLRequest(url: urlRequest.url!)
-            //options.append(.schema("")) // so that ClientRequest doesn't apend http
+            
             request?.addValue("", forHTTPHeaderField: "schema")
-            //options.append(.method(method.rawValue)) // set method of request
             request?.httpMethod = method.rawValue
 
 
             // headers
             if let headers = headers {
-                //options.append(.allHTTPHeaderFields(headers))
-                //options?.addValue(headers, forHTTPHeaderField: "headers")
                 request?.allHTTPHeaderFields = headers
             }
-
-            //if let headers = urlRequest.allHTTPHeaderFields {
-                //options.append(.headers(headers))
-            //}
-
-
-            //self.response = URLResponse(url: URL(string: url)!, mimeType: "", expectedContentLength: -1, textEncodingName: nil)
-            
             
             if let body = urlRequest.httpBody {
                 request?.httpBody = body
-                //request.write(from: body)
             }
 
             self.request = request
         } catch {
+            
             self.request = nil
             self.error = error
+            
         }
     }
 
     public func response(_ completionHandler: @escaping CompletionHandler) {
-
-        /*guard self.response != nil else {
-            completionHandler((request, nil, nil, error))
-            return
-        }*/
-
         
         var configuration = URLSessionConfiguration()
         configuration = .default
@@ -95,19 +78,12 @@ public class Request{
         let result = session?.dataTask(with: self.request!) {
             (data: Data?, response: URLResponse?, error: Error?) in
             if let error = error {
-                completionHandler((self.request, nil, nil, error))
+                completionHandler(self.request, nil, nil, error)
             }
-            completionHandler((self.request, response, data, error))
+            completionHandler(self.request, response, data?.base64EncodedData(), error)
         }
 
         result?.resume()
-        
-//        do {
-//            _ = try read(&data)
-//            completionHandler((request, response, data, error))
-//        } catch {
-//            print("Error in Kitura-Request response: \(error)")
-//        }
 
     }
 

@@ -21,7 +21,7 @@ public struct URLEncoding: Encoding {
 
     public static let `default` = URLEncoding()
 
-    public func encode(_ request: inout NSMutableURLRequest, parameters: Request.Parameters?) throws {
+    public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         guard let parameters = parameters, !parameters.isEmpty else { return }
 
         guard let url = request.url,

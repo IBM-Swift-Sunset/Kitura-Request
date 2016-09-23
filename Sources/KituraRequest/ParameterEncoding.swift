@@ -17,13 +17,13 @@
 
 import Foundation
 
-public enum ParameterEncodingError: Swift.Error {
+/*public enum ParameterEncodingError: Swift.Error {
     case couldNotCreateComponentsFromURL
     case couldNotCreateURLFromComponents
     case couldNotCreateMultipart
-}
+}*/
 
-public enum ParameterEncoding {
+/*public enum ParameterEncoding {
     case url
     case json
     case multipart
@@ -172,4 +172,4 @@ extension ParameterEncoding {
         let query = self.getComponents(from: dict).query
         return (query.map { "\($0)=\($1)" } as [String]).joined(separator: "&")
     }
-}
+}*/

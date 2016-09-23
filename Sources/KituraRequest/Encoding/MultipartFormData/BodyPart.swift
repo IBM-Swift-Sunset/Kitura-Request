@@ -54,7 +54,7 @@ public struct BodyPart {
         guard let data = string.data(using: .utf8, allowLossyConversion: false) else {
             return nil
         }
-
+        
         self.key = key
         self.data = data
         self.mimeType = .none
@@ -92,7 +92,7 @@ public struct BodyPart {
 
         result.append(header)
         result.append(self.data)
-
+        
         return result
     }
 }

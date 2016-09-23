@@ -20,7 +20,7 @@ import KituraRequest
 
 class E2ETests: XCTestCase {
 
-  /*func testRequestReturnsData() {
+  func testRequestReturnsData() {
     KituraRequest.request(.GET, "https://httpbin.org/html")
       .response {
         _, _, data, _ in
@@ -30,13 +30,13 @@ class E2ETests: XCTestCase {
           XCTFail("No data returned")
         }
     }
-  }*/
+  }
 }
 
 extension E2ETests {
   static var allTests: [(String, (E2ETests) -> () throws -> Void)] {
     return [
-             //("testRequestReturnsData", testRequestReturnsData)
+             ("testRequestReturnsData", testRequestReturnsData)
     ]
   }
 }

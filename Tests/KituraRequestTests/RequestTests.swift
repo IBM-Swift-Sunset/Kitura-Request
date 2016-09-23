@@ -52,7 +52,7 @@ class RequestTests: XCTestCase {
                     expectation1.fulfill()
                     return;
                 }
-
+                print(String(data:data, encoding: .utf8))
                 KituraRequest.request(.POST,
                     "http://httpbin.org/post",
                     parameters: [
@@ -67,8 +67,8 @@ class RequestTests: XCTestCase {
                             return
                         }
 
-                        XCTAssertTrue(string.contains("\"file\": \"data:image/png;base64,"), "file should exits in request")
-                        XCTAssertTrue(string.contains("\"key\": \"value\""), "key value should exits in request")
+                        XCTAssertTrue(string.contains("\"file\": \"data:image/png;base64,"), "File should exist in request")
+                        XCTAssertTrue(string.contains("\"key\": \"value\""), "Key value should exist in request")
 
                         expectation1.fulfill()
                 }

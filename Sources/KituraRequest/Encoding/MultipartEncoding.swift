@@ -24,7 +24,7 @@ public struct MultipartEncoding: Encoding {
         self.bodyParts = bodyParts
     }
 
-    public func encode(_ request: inout NSMutableURLRequest, parameters: Request.Parameters?) throws {
+    public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         let bodyData = try self.body(for: parameters)
 
         if let httpBody = bodyData.0 {
