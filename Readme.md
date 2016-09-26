@@ -21,7 +21,7 @@ TODO:
 To install KituraRequest add following line to Dependencies in `Package.json`:
 
 ```swift
-.Package(url: "https://github.com/IBM-Swift/Kitura-Request.git", majorVersion: 0)
+.Package(url: "https://github.com/IBM-Swift/Kitura-Request.git", majorVersion: 1)
 ```
 
 Currently `Swift 3.0 Release` is supported
