@@ -3,6 +3,8 @@ KituraRequest
 
 **Warning: This is work in progress**
 
+**Currently working on macOS but NOT on Linux**
+
 A module for sending HTTP requests in [IBM Kitura](https://github.com/IBM-Swift/Kitura) based applications. It wraps KituraNet `ClientRequest` class and exposes a familiar interface known from Alamofire.
 
 TODO:
@@ -14,8 +16,8 @@ TODO:
 - [x] Add synchronus interface
 - [ ] Add async interface
 - [x] Write instructions
-- [x] ~~Switch back to depend on IBM Kitura-net~~
-- [ ] Use URLSession
+- [ ] ~~Switch back to depend on IBM Kitura-net~~
+- [x] Use URLSession
 
 
 ## Installation
