@@ -26,7 +26,6 @@ public struct MultipartEncoding: Encoding {
 
     public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         let bodyData = try self.body(for: parameters)
-
         if let httpBody = bodyData.0 {
             request.httpBody = httpBody
         }

@@ -52,7 +52,7 @@ class RequestTests: XCTestCase {
                     expectation1.fulfill()
                     return;
                 }
-                print(String(data:data, encoding: .utf8))
+
                 KituraRequest.request(.POST,
                     "http://httpbin.org/post",
                     parameters: [

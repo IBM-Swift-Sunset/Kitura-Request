@@ -31,7 +31,6 @@ public class KituraRequest {
                            encoding: encoding,
                            headers: headers)
     
-    //request.submit()
     return request
   }
 }
