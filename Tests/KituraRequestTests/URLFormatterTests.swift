@@ -29,25 +29,41 @@ class URLFormatterTests: XCTestCase {
   func testRequestWithInvalidReturnsError() {
     let invalidURL = "http://💩.com"
     let testRequest = Request(method: .get, invalidURL)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.invalidURL)
+
+    guard case .urlFormat(.invalidURL) = testRequest.error as! KituraRequest.Error else {
+        XCTFail()
+        return
+    }
   }
 
   func testRequestWithURLWithoutSchemeReturnsError() {
     let URLWithoutScheme = "apple.com"
     let testRequest = Request(method: .get, URLWithoutScheme)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.noSchemeProvided)
+
+    guard case .urlFormat(.noSchemeProvided) = testRequest.error as! KituraRequest.Error else {
+        XCTFail()
+        return
+    }
   }
 
   func testRequestWithNoHostReturnsError() {
     let URLWithoutHost = "http://"
     let testRequest = Request(method: .get, URLWithoutHost)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.noHostProvided)
+
+    guard case .urlFormat(.noHostProvided) = testRequest.error as! KituraRequest.Error else {
+        XCTFail()
+        return
+    }
   }
 
   func testRequestWithNoHostAndQueryReturnsError() {
     let URLWithoutHost = "http://?asd=asd"
     let testRequest = Request(method: .get, URLWithoutHost)
-    XCTAssertEqual(testRequest.error as? RequestError, RequestError.noHostProvided)
+
+    guard case .urlFormat(.noHostProvided) = testRequest.error as! KituraRequest.Error else {
+        XCTFail()
+        return
+    }
   }
 
   func testValidURLCreatesValidClientRequest() {

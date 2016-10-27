@@ -18,13 +18,13 @@ extension KituraRequest {
 
     public enum Error: Swift.Error {
 
-        public enum URLEncodingError {
+        public enum URLEncodingError: Int {
 
             case noComponentsFromURL
             case noURLFromComponents
         }
 
-        public enum MultipartEncodingError {
+        public enum MultipartEncodingError: Int {
 
             case headerEncoding
             case noBoundary
@@ -33,5 +33,15 @@ extension KituraRequest {
         case urlEncoding(URLEncodingError)
         case multipartEncoding(MultipartEncodingError)
         case jsonEncoding(reason: Swift.Error)
+
+
+        public enum URLFormatError: Int {
+
+            case invalidURL
+            case noHostProvided
+            case noSchemeProvided
+        }
+
+        case urlFormat(URLFormatError)
     }
 }

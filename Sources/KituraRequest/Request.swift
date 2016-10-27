@@ -115,15 +115,15 @@ extension Request {
 
       // or use NSURL:
       guard let validURL = URL(string: url) else {
-        throw RequestError.invalidURL
+        throw KituraRequest.Error.urlFormat(.invalidURL)
       }
 
       guard validURL.scheme != nil else {
-        throw RequestError.noSchemeProvided
+        throw KituraRequest.Error.urlFormat(.noSchemeProvided)
       }
 
       guard validURL.host != nil else {
-        throw RequestError.noHostProvided
+        throw KituraRequest.Error.urlFormat(.noHostProvided)
       }
 
       return NSMutableURLRequest(url: validURL)
