@@ -26,13 +26,13 @@ public struct URLEncoding: Encoding {
 
         guard let url = request.url,
             let components = NSURLComponents(url: url, resolvingAgainstBaseURL: false) else {
-                throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
+                throw KituraRequest.Error.urlEncoding(.noComponentsFromURL) // this should never happen
         }
 
         components.query = URLEncoding.getQuery(from: parameters)
 
         guard let newURL = components.url else {
-            throw ParameterEncodingError.couldNotCreateComponentsFromURL // this should never happen
+            throw KituraRequest.Error.urlEncoding(.noURLFromComponents) // this should never happen
         }
 
         request.url = newURL

@@ -14,10 +14,10 @@
  * limitations under the License.
  **/
 
-public enum RequestError: Swift.Error {
-  case invalidURL
-  case noSchemeProvided
-  case noHostProvided
-  case notImplemented
-  case parameterCanNotBeEncoded
+import Foundation
+import KituraNet
+
+extension Request {
+
+    public typealias CompletionHandler = (ClientRequest?, ClientResponse?, Data?, Swift.Error?) -> Void
 }
