@@ -19,9 +19,9 @@ import Foundation
 
 public struct JSONEncoding: Encoding {
 
-    private(set) var options: JSONSerialization.WritingOptions
-
     public static let `default` = JSONEncoding(options: [])
+
+    private(set) var options: JSONSerialization.WritingOptions
 
     public init(options: JSONSerialization.WritingOptions) {
         self.options = options

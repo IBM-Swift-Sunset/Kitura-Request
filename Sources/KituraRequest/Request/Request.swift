@@ -40,6 +40,7 @@ public class Request {
             options.append(.method(method.rawValue)) // set method of request
 
             var urlRequest = try formatURL(URL)
+            urlRequest.httpMethod = method.rawValue
 
             try encoding.encode(&urlRequest, parameters: parameters)
 
