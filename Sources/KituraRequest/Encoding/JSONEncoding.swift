@@ -19,16 +19,21 @@ import Foundation
 
 public struct JSONEncoding: Encoding {
 
-    public static let `default` = JSONEncoding()
+    private(set) var options: JSONSerialization.WritingOptions
+
+    public static let `default` = JSONEncoding(options: [])
+
+    public init(options: JSONSerialization.WritingOptions) {
+        self.options = options
+    }
 
     public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         guard let parameters = parameters, !parameters.isEmpty else { return }
 
-        let options = JSONSerialization.WritingOptions()
         do {
-            let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
+            let data = try JSONSerialization.data(withJSONObject: parameters, options: self.options)
             request.httpBody = data
         } catch {
             throw KituraRequest.Error.jsonEncoding(reason: error)

@@ -20,6 +20,7 @@ import Foundation
 public struct MultipartEncoding: Encoding {
 
     private var bodyParts: [BodyPart]?
+    
     public init(_ bodyParts: [BodyPart]?) {
         self.bodyParts = bodyParts
     }
