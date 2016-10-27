@@ -17,23 +17,40 @@
 
 import Foundation
 
+///
 public struct URLEncoding: Encoding {
 
+    ///
     public enum Mode {
 
+        ///
         case `default`
+
+        ///
         case urlQuery
+
+        ///
         case httpBody
     }
 
+    ///
     public static let `default` = URLEncoding(mode: .default)
 
+    ///
     private(set) var mode: Mode
 
+    ///
+    ///
+    //
     public init(mode: Mode) {
         self.mode = mode
     }
 
+    ///
+    ///
+    ///
+    ///
+    ///
     public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         guard let parameters = parameters,
             !parameters.isEmpty else {

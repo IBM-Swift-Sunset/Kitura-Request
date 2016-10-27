@@ -22,27 +22,33 @@ extension String {
 
 public struct BodyBoundary {
 
+    ///
     private(set) var value: String
 
+    ///
     init() {
         let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
         self.init(boundaryString)
     }
 
+    ///
     init(_ value: String) {
         self.value = value
     }
 
+    ///
     public var initial: Data? {
         let boundary = "--\(self.value)\(String.newLine)"
         return boundary.data(using: .utf8, allowLossyConversion: false)
     }
 
+    ///
     public var encapsulated: Data? {
         let boundary = "\(String.newLine)--\(self.value)\(String.newLine)"
         return boundary.data(using: .utf8, allowLossyConversion: false)
     }
 
+    ///
     public var final: Data? {
         let boundary = "\(String.newLine)--\(self.value)--\(String.newLine)"
         return boundary.data(using: .utf8, allowLossyConversion: false)

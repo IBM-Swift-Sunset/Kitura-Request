@@ -16,32 +16,52 @@
 
 extension KituraRequest {
 
+    ///
     public enum Error: Swift.Error {
 
+        ///
         public enum URLEncodingError {
 
+            ///
             case noComponentsFromURL
+
+            ///
             case noURLFromComponents
         }
 
+        ///
         public enum MultipartEncodingError {
 
+            ///
             case headerEncoding
+
+            ///
             case noBoundary
         }
 
+        ///
         case urlEncoding(URLEncodingError)
+
+        ///
         case multipartEncoding(MultipartEncodingError)
+
+        ///
         case jsonEncoding(reason: Swift.Error)
 
-
+        ///
         public enum URLFormatError {
 
+            ///
             case invalidURL
+
+            ///
             case noHostProvided
+
+            ///
             case noSchemeProvided
         }
 
+        ///
         case urlFormat(URLFormatError)
     }
 }

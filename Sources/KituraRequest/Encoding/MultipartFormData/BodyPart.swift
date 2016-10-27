@@ -17,13 +17,25 @@
 
 import Foundation
 
+///
 public struct BodyPart {
 
-    private(set) var key: String
-    private(set) var data: Data
-    private(set) var mimeType: MimeType
-    private(set) var fileName: String?
+    ///
+    private(set) public var key: String
 
+    ///
+    private(set) public var data: Data
+
+    ///
+    private(set) public var mimeType: MimeType
+
+    ///
+    private(set) public var fileName: String?
+
+    ///
+    ///
+    ///
+    ///
     public init?(key: String, value: Any) {
         let string = String(describing: value)
         guard let data = string.data(using: .utf8, allowLossyConversion: false) else {
@@ -35,6 +47,11 @@ public struct BodyPart {
         self.mimeType = .none
     }
 
+    ///
+    ///
+    ///
+    ///
+    ///
     public init(key: String, data: Data, mimeType: MimeType = .none, fileName: String? = nil) {
         self.key = key
         self.data = data
@@ -42,6 +59,7 @@ public struct BodyPart {
         self.fileName = fileName
     }
 
+    ///
     private var header: String {
         var header = "Content-Disposition: form-data; name=\(self.key)"
 
@@ -58,6 +76,7 @@ public struct BodyPart {
         return header
     }
 
+    ///
     public func content() throws -> Data {
         var result = Data()
         let headerString = self.header

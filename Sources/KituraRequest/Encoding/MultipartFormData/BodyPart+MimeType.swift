@@ -19,24 +19,35 @@ import Foundation
 
 extension BodyPart {
 
+    ///
     public enum MimeType {
 
-        public enum Image: String {
-            case any = "*"
-            case png = "png"
-            case jpeg = "jpeg"
-        }
-
+        ///
         case none
-        case text
-        case image(Image)
 
+        ///
+        case text(TextSubtype)
+
+        ///
+        case image(ImageSubtype)
+
+        ///
+        case application(ApplicationSubtype)
+
+        ///
+        case raw(String)
+
+        ///
         var value: String? {
             switch self {
             case .image(let type):
                 return "image/\(type.rawValue)"
-            case .text:
-                return "text/plain"
+            case .text(let type):
+                return "text/\(type.rawValue)"
+            case .application(let type):
+                return "application/\(type.rawValue)"
+            case .raw(let value):
+                return value
             default:
                 break
             }

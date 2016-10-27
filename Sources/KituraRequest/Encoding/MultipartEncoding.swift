@@ -17,14 +17,20 @@
 
 import Foundation
 
+///
 public struct MultipartEncoding: Encoding {
 
+    ///
     private var bodyParts: [BodyPart]?
-    
+
+    ///
+    ///
+    //
     public init(_ bodyParts: [BodyPart]?) {
         self.bodyParts = bodyParts
     }
 
+    ///
     public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         let bodyData = try self.body(for: parameters)
 
@@ -39,6 +45,11 @@ public struct MultipartEncoding: Encoding {
         }
     }
 
+    ///
+    ///
+    ///
+    ///
+    ///
     private func body(for parameters: Request.Parameters?) throws -> (Data?, String?) {
         var requestBodyParts = [BodyPart]()
 

@@ -19,5 +19,6 @@ import KituraNet
 
 extension Request {
 
+    /// Request completion callback type
     public typealias CompletionHandler = (ClientRequest?, ClientResponse?, Data?, Swift.Error?) -> Void
 }

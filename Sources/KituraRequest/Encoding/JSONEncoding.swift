@@ -17,16 +17,25 @@
 
 import Foundation
 
+///
 public struct JSONEncoding: Encoding {
 
+    ///
     public static let `default` = JSONEncoding(options: [])
 
+    ///
     private(set) var options: JSONSerialization.WritingOptions
 
+    ///
     public init(options: JSONSerialization.WritingOptions) {
         self.options = options
     }
 
+    ///
+    ///
+    ///
+    ///
+    ///
     public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 

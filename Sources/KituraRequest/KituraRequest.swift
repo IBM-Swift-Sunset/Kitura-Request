@@ -16,20 +16,21 @@
 
 import Foundation
 
+///
 public class KituraRequest {
 
-  public static func request(_ method: Request.Method,
+    ///
+    public static func request(_ method: Request.Method,
                             _ URL: String,
                             parameters: Request.Parameters? = nil,
                             encoding: Encoding = URLEncoding.default,
                             headers: [String: String]? = nil) -> Request {
-
-    let request =  Request(method: method,
-                           URL,
-                           parameters: parameters,
-                           encoding: encoding,
-                           headers: headers)
-    request.submit()
-    return request
-  }
+        let request =  Request(method: method,
+                            URL,
+                            parameters: parameters,
+                            encoding: encoding,
+                            headers: headers)
+        request.submit()
+        return request
+    }
 }

@@ -23,11 +23,21 @@ import LoggerAPI
 /// TODO: Make an asynchronus version
 public class Request {
 
+    ///
     private(set) var request: ClientRequest?
+
+    ///
     private(set) var response: ClientResponse?
+
+    ///
     private(set) var data: NSData?
+
+    ///
     private(set) var error: Swift.Error?
 
+    ///
+    ///
+    //
     public init(method: Method,
              _ URL: String,
              parameters: Parameters? = nil,
@@ -71,6 +81,9 @@ public class Request {
         }
     }
 
+    ///
+    ///
+    ///
     public func response(_ completionHandler: @escaping CompletionHandler) {
         guard let response = response else {
             completionHandler(request, nil, nil, error)
@@ -86,6 +99,7 @@ public class Request {
         }
     }
 
+    ///
     func submit() {
         request?.end()
     }
@@ -93,6 +107,9 @@ public class Request {
 
 extension Request {
 
+    ///
+    ///
+    ///
     fileprivate func formatURL(_ url: String) throws -> URLRequest {
       guard let validURL = URL(string: url) else {
         throw KituraRequest.Error.urlFormat(.invalidURL)

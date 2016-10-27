@@ -16,8 +16,10 @@
 
 import Foundation
 
+///
 public protocol Encoding {
 
+    ///
     func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws
 }
 
@@ -25,6 +27,7 @@ extension Encoding {
 
     typealias Components = [(String, String)]
 
+    ///
     private static func getComponents(_ key: String, _ value: Any) -> Components {
         var result = Components()
 
@@ -46,6 +49,7 @@ extension Encoding {
         return result
     }
 
+    ///
     static func getComponents(from parameters: Request.Parameters) -> Components {
         let components = parameters.reduce(Components()) { value, element in
             let key = element.0
@@ -55,6 +59,4 @@ extension Encoding {
 
         return components
     }
-
-
 }
