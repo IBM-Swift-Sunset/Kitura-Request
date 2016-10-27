@@ -20,7 +20,9 @@ import Glibc
 import Darwin
 #endif
 
+/// `KituraRequest` randomizer.
 ///
+/// - Returns: randomized number
 func randomize(max: Int? = nil) -> Int {
     #if os(Linux)
         return max == nil ? Int(random()) : Int(random() % (max! + 1))

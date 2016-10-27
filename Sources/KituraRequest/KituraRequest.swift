@@ -19,7 +19,13 @@ import Foundation
 ///
 public class KituraRequest {
 
+    /// Creates new request and performs it immediately.
     ///
+    /// - Parameter method: request method.
+    /// - Parameter URL: request url string.
+    /// - Parameter parameters: parameters that will be send with request.
+    /// - Parameter encoding: encoding that will be used.
+    /// - Parameter headers: additional header.
     public static func request(_ method: Request.Method,
                             _ URL: String,
                             parameters: Request.Parameters? = nil,

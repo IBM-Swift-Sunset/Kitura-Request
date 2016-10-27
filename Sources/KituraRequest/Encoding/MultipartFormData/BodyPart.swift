@@ -17,25 +17,25 @@
 
 import Foundation
 
-///
+/// An item for `MultipartEncoding` used to encode files or data of specific type.
 public struct BodyPart {
 
-    ///
+    /// An item key.
     private(set) public var key: String
 
-    ///
+    /// An item data.
     private(set) public var data: Data
 
-    ///
+    /// An item mime type.
     private(set) public var mimeType: MimeType
 
-    ///
+    /// Optional item file name.
     private(set) public var fileName: String?
 
+    /// An optional initializer.
     ///
-    ///
-    ///
-    ///
+    /// - Parameter key: parameter key.
+    /// - Parameter value: parameter value.
     public init?(key: String, value: Any) {
         let string = String(describing: value)
         guard let data = string.data(using: .utf8, allowLossyConversion: false) else {
@@ -47,11 +47,12 @@ public struct BodyPart {
         self.mimeType = .none
     }
 
+    /// Initializes form item with specified parameters.
     ///
-    ///
-    ///
-    ///
-    ///
+    /// - Parameter key: parameter key.
+    /// - Parameter data: parameter data.
+    /// - Parameter mimeType: parameter mime type.
+    /// - Parameter fileName: optional parameter file name.
     public init(key: String, data: Data, mimeType: MimeType = .none, fileName: String? = nil) {
         self.key = key
         self.data = data
@@ -59,7 +60,7 @@ public struct BodyPart {
         self.fileName = fileName
     }
 
-    ///
+    /// A form item header.
     private var header: String {
         var header = "Content-Disposition: form-data; name=\(self.key)"
 
@@ -76,7 +77,9 @@ public struct BodyPart {
         return header
     }
 
+    /// A form item content.
     ///
+    /// - Returns: a data describing body item.
     public func content() throws -> Data {
         var result = Data()
         let headerString = self.header

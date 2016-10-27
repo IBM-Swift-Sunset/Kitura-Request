@@ -23,21 +23,25 @@ import LoggerAPI
 /// TODO: Make an asynchronus version
 public class Request {
 
-    ///
+    /// Generated request
     private(set) var request: ClientRequest?
 
-    ///
+    /// Generated response on request
     private(set) var response: ClientResponse?
 
-    ///
+    /// Request's response data
     private(set) var data: NSData?
 
-    ///
+    /// Request error
     private(set) var error: Swift.Error?
 
+    /// Initializes new `Request` class.
     ///
-    ///
-    //
+    /// - Parameter method: request method.
+    /// - Parameter URL: request url string.
+    /// - Parameter parameters: parameters that will be send with request.
+    /// - Parameter encoding: encoding that will be used.
+    /// - Parameter headers: additional header.
     public init(method: Method,
              _ URL: String,
              parameters: Parameters? = nil,
@@ -81,9 +85,9 @@ public class Request {
         }
     }
 
+    /// Set a response callback
     ///
-    ///
-    ///
+    /// - Parameter completionHandler: callback to be called when request finishes.
     public func response(_ completionHandler: @escaping CompletionHandler) {
         guard let response = response else {
             completionHandler(request, nil, nil, error)
@@ -99,7 +103,7 @@ public class Request {
         }
     }
 
-    ///
+    /// Perform a request
     func submit() {
         request?.end()
     }
@@ -107,9 +111,11 @@ public class Request {
 
 extension Request {
 
+    /// Check string url for errors and generate URLRequest
     ///
+    /// - Parameter url: url string.
     ///
-    ///
+    /// - Returns: a request to given url.
     fileprivate func formatURL(_ url: String) throws -> URLRequest {
       guard let validURL = URL(string: url) else {
         throw KituraRequest.Error.urlFormat(.invalidURL)

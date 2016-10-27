@@ -16,18 +16,24 @@
 
 import Foundation
 
-///
+/// Common encoding protocol.
 public protocol Encoding {
 
-    ///
+    /// Method used for `Request` parameters encoding.
     func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws
 }
 
 extension Encoding {
 
+    /// Encoding components.
     typealias Components = [(String, String)]
 
+    /// Parse components from key and value.
     ///
+    /// - Parameter key: string value of parameter key.
+    /// - Parameter value: value of parameter.
+    ///
+    /// - Returns: a components array
     private static func getComponents(_ key: String, _ value: Any) -> Components {
         var result = Components()
 
@@ -49,7 +55,11 @@ extension Encoding {
         return result
     }
 
+    /// Parse `Request` parameters to components for encoder
     ///
+    /// - Parameter parameters: parameters to parse
+    ///
+    /// - Returns: a components array
     static func getComponents(from parameters: Request.Parameters) -> Components {
         let components = parameters.reduce(Components()) { value, element in
             let key = element.0

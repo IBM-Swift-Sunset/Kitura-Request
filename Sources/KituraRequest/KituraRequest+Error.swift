@@ -16,52 +16,52 @@
 
 extension KituraRequest {
 
-    ///
+    /// Errors that can be thrown by `KituraRequest`.
     public enum Error: Swift.Error {
 
-        ///
+        /// URL encoding error subtypes.
         public enum URLEncodingError {
 
-            ///
+            /// Could not generate a components from formatted URL.
             case noComponentsFromURL
 
-            ///
+            /// Could not generate an URL from provided components.
             case noURLFromComponents
         }
 
-        ///
+        /// Multipart encoding error subtypes.
         public enum MultipartEncodingError {
 
-            ///
+            /// Could not generate a multipart header data.
             case headerEncoding
 
-            ///
+            /// Could not find a corresponding boundary while encoding.
             case noBoundary
         }
 
-        ///
+        /// Used when there is an error in `URLEconding`.
         case urlEncoding(URLEncodingError)
 
-        ///
+        /// Used when there is an error in `MultipartEncoding`.
         case multipartEncoding(MultipartEncodingError)
 
-        ///
+        /// Used when there is an error in `JSONEncoding`.
         case jsonEncoding(reason: Swift.Error)
 
-        ///
+        /// URL format error subtypes.
         public enum URLFormatError {
 
-            ///
+            /// An incorrect url string was passed to request.
             case invalidURL
 
-            ///
+            /// Provided url did not contain a host.
             case noHostProvided
 
-            ///
+            /// Provided url did not contain a scheme.
             case noSchemeProvided
         }
 
-        ///
+        /// Used when there is an error in url generation.
         case urlFormat(URLFormatError)
     }
 }
