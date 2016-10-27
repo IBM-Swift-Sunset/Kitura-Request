@@ -21,7 +21,7 @@ import KituraRequest
 class E2ETests: XCTestCase {
 
   func testRequestReturnsData() {
-    KituraRequest.request(.GET, "https://httpbin.org/html")
+    KituraRequest.request(.get, "https://httpbin.org/html")
       .response {
         _, _, data, _ in
         if data != nil {

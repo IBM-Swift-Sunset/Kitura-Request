@@ -28,31 +28,31 @@ class URLFormatterTests: XCTestCase {
 
   func testRequestWithInvalidReturnsError() {
     let invalidURL = "http://💩.com"
-    let testRequest = Request(method: .GET, invalidURL)
+    let testRequest = Request(method: .get, invalidURL)
     XCTAssertEqual(testRequest.error as? RequestError, RequestError.invalidURL)
   }
 
   func testRequestWithURLWithoutSchemeReturnsError() {
     let URLWithoutScheme = "apple.com"
-    let testRequest = Request(method: .GET, URLWithoutScheme)
+    let testRequest = Request(method: .get, URLWithoutScheme)
     XCTAssertEqual(testRequest.error as? RequestError, RequestError.noSchemeProvided)
   }
 
   func testRequestWithNoHostReturnsError() {
     let URLWithoutHost = "http://"
-    let testRequest = Request(method: .GET, URLWithoutHost)
+    let testRequest = Request(method: .get, URLWithoutHost)
     XCTAssertEqual(testRequest.error as? RequestError, RequestError.noHostProvided)
   }
 
   func testRequestWithNoHostAndQueryReturnsError() {
     let URLWithoutHost = "http://?asd=asd"
-    let testRequest = Request(method: .GET, URLWithoutHost)
+    let testRequest = Request(method: .get, URLWithoutHost)
     XCTAssertEqual(testRequest.error as? RequestError, RequestError.noHostProvided)
   }
 
   func testValidURLCreatesValidClientRequest() {
     let validURL = "https://66o.tech"
-    let testRequest = Request(method: .GET, validURL)
+    let testRequest = Request(method: .get, validURL)
 
     XCTAssertEqual(testRequest.request?.url, validURL)
   }

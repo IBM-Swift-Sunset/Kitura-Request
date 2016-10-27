@@ -31,7 +31,15 @@ public class Request {
     public typealias Parameters = [String : Any]
 
     public enum Method: String {
-        case CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE
+        case options = "OPTIONS"
+        case get     = "GET"
+        case head    = "HEAD"
+        case post    = "POST"
+        case put     = "PUT"
+        case patch   = "PATCH"
+        case delete  = "DELETE"
+        case trace   = "TRACE"
+        case connect = "CONNECT"
     }
 
     public typealias CompletionHandler = (_ request: ClientRequest?, _ response: ClientResponse?, _ data: Data?, _ error: Swift.Error?) -> Void
