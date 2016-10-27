@@ -23,26 +23,10 @@ import LoggerAPI
 /// TODO: Make an asynchronus version
 public class Request {
 
-    var request: ClientRequest?
-    var response: ClientResponse?
-    var data: NSData?
-    var error: Swift.Error?
-
-    public typealias Parameters = [String : Any]
-
-    public enum Method: String {
-        case options = "OPTIONS"
-        case get     = "GET"
-        case head    = "HEAD"
-        case post    = "POST"
-        case put     = "PUT"
-        case patch   = "PATCH"
-        case delete  = "DELETE"
-        case trace   = "TRACE"
-        case connect = "CONNECT"
-    }
-
-    public typealias CompletionHandler = (_ request: ClientRequest?, _ response: ClientResponse?, _ data: Data?, _ error: Swift.Error?) -> Void
+    private(set) var request: ClientRequest?
+    private(set) var response: ClientResponse?
+    private(set) var data: NSData?
+    private(set) var error: Swift.Error?
 
     public init(method: Method,
              _ URL: String,
@@ -108,7 +92,7 @@ public class Request {
 
 extension Request {
 
-    func formatURL(_ url: String) throws -> NSMutableURLRequest {
+    fileprivate func formatURL(_ url: String) throws -> NSMutableURLRequest {
       // Regex to test validity of url:
       // _^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS
       // also check RFC 1808
