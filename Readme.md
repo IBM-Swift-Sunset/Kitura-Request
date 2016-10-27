@@ -33,17 +33,33 @@ API of KituraRequest should feel familiar as it closely maps the one of [Alamofi
 To create a request object simply call
 
 ```swift
-KituraRequest.request(.GET, "https://httpbin.org/get"]
+KituraRequest.request(.get, "https://httpbin.org/get"]
 ```
 
 #### Request parameters and parameters encoding
 You can also create a request with parameters by passing `[String: Any]` dictionary together with an encoding method:
 
 ```swift
-KituraRequest.request(.POST,
+KituraRequest.request(.post,
                       "https://httpbin.org/post",
                       parameters: ["foo":"bar"],
                       encoding: JSONEncoding.default)
+```
+
+```swift
+KituraRequest.request(.post,
+                      "https://httpbin.org/post",
+                      parameters: ["foo":"bar"],
+                      encoding: URLEncoding.default)
+```
+
+```swift
+KituraRequest.request(.post,
+                      "https://httpbin.org/post",
+                      parameters: ["foo":"bar"],
+                      encoding: MultipartEncoding([
+                        BodyPart(key: "file", data: data, mimeType: .image(.png), fileName: "image.jpg")
+                    ]))
 ```
 
 Currently `URLEncoding`, `JSONEncoding` and `MultipartEncoding` encodings is supported by default.
@@ -59,7 +75,7 @@ To create custom parameter encoding extend any class or struct with `Encoding` p
 To set headers in the request pass them as `[String: String]` dictionary as shown below:
 
 ```swift
-KituraRequest.request(.GET,
+KituraRequest.request(.get,
                       "https://httpbin.org/get",
                       headers: ["User-Agent":"Awesome-App"])
 ```
@@ -68,7 +84,7 @@ KituraRequest.request(.GET,
 Currently there is only one method that you can call to get back the requests response and it returns `NSData`.
 
 ```swift
-KituraRequest.request(.GET, "https://google.com"].response {
+KituraRequest.request(.get, "https://google.com").response {
   request, response, data, error in
   // do something with data
 }

@@ -22,7 +22,7 @@ import KituraNet
 
 class RequestTests: XCTestCase {
 
-  var testRequest = KituraRequest.request(.POST,
+  var testRequest = KituraRequest.request(.post,
                                           "https://google.com",
                                           parameters: ["asd":"asd"],
                                           headers: ["User-Agent":"Kitura-Server"]
@@ -45,14 +45,14 @@ class RequestTests: XCTestCase {
   }
 
     func testMultipartRequest() {
-        KituraRequest.request(.GET,
+        KituraRequest.request(.get,
             "http://httpbin.org/image/png").response { _, _, data, error in
                 guard let data = data else {
                     XCTFail("data should exits")
                     return
                 }
 
-                KituraRequest.request(.POST,
+                KituraRequest.request(.post,
                     "http://httpbin.org/post",
                     parameters: [
                         "key" : "value"
