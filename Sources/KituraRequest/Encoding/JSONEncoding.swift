@@ -21,7 +21,7 @@ public struct JSONEncoding: Encoding {
 
     public static let `default` = JSONEncoding()
 
-    public func encode(_ request: inout NSMutableURLRequest, parameters: Request.Parameters?) throws {
+    public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         guard let parameters = parameters, !parameters.isEmpty else { return }

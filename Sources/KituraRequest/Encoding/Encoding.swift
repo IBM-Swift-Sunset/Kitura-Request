@@ -18,7 +18,7 @@ import Foundation
 
 public protocol Encoding {
 
-    func encode(_ request: inout NSMutableURLRequest, parameters: Request.Parameters?) throws
+    func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws
 }
 
 extension Encoding {
