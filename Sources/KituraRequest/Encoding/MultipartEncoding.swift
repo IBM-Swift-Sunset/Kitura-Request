@@ -72,7 +72,7 @@ public struct MultipartEncoding: Encoding {
                 let encapsulated = boundary.encapsulated {
                     bodyBoundary = encapsulated
             } else {
-                throw ParameterEncodingError.couldNotCreateMultipart
+                throw KituraRequest.Error.multipartEncoding(.noBoundary)
             }
 
             result.append(bodyBoundary)
@@ -82,7 +82,7 @@ public struct MultipartEncoding: Encoding {
         }
 
         guard let final = boundary.final else {
-            throw ParameterEncodingError.couldNotCreateMultipart
+            throw KituraRequest.Error.multipartEncoding(.noBoundary)
         }
 
         result.append(final)

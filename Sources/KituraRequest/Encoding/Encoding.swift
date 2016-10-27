@@ -16,12 +16,6 @@
 
 import Foundation
 
-public enum ParameterEncodingError: Swift.Error {
-    case couldNotCreateComponentsFromURL
-    case couldNotCreateURLFromComponents
-    case couldNotCreateMultipart
-}
-
 public protocol Encoding {
 
     func encode(_ request: inout NSMutableURLRequest, parameters: Request.Parameters?) throws

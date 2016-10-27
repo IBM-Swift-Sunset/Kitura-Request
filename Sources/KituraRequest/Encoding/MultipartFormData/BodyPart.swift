@@ -19,31 +19,6 @@ import Foundation
 
 public struct BodyPart {
 
-    public enum MimeType {
-
-        public enum Image: String {
-            case any = "*"
-            case png = "png"
-            case jpeg = "jpeg"
-        }
-
-        case none
-        case text
-        case image(Image)
-
-        var value: String? {
-            switch self {
-            case .image(let type):
-                return "image/\(type.rawValue)"
-            case .text:
-                return "text/plain"
-            default:
-                break
-            }
-            return nil
-        }
-    }
-
     private(set) var key: String
     private(set) var data: Data
     private(set) var mimeType: MimeType
@@ -86,8 +61,9 @@ public struct BodyPart {
     public func content() throws -> Data {
         var result = Data()
         let headerString = self.header
+
         guard let header = headerString.data(using: .utf8, allowLossyConversion: false) else {
-            throw ParameterEncodingError.couldNotCreateMultipart
+            throw KituraRequest.Error.multipartEncoding(.headerEncoding)
         }
 
         result.append(header)

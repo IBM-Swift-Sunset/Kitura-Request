@@ -27,7 +27,11 @@ public struct JSONEncoding: Encoding {
         guard let parameters = parameters, !parameters.isEmpty else { return }
 
         let options = JSONSerialization.WritingOptions()
-        let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
-        request.httpBody = data
+        do {
+            let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
+            request.httpBody = data
+        } catch {
+            throw KituraRequest.Error.jsonEncoding(reason: error)
+        }
     }
 }
