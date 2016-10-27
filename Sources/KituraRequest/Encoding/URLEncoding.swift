@@ -59,6 +59,7 @@ public struct URLEncoding: Encoding {
             let query = URLEncoding.getQuery(from: parameters)
 
             request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+
             request.httpBody = query.data(using: .utf8, allowLossyConversion: false)
         }
     }
