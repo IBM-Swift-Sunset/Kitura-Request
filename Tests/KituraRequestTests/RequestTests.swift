@@ -22,7 +22,7 @@ import KituraNet
 
 class RequestTests: XCTestCase {
 
-  var testRequest = KituraRequest.request(.post,
+  var testRequest = KituraRequest.request(.get,
                                           "https://google.com",
                                           parameters: ["asd":"asd"],
                                           headers: ["User-Agent":"Kitura-Server"]
@@ -33,7 +33,7 @@ class RequestTests: XCTestCase {
   }
 
   func testRequestAssignClientRequestMethod() {
-    XCTAssertEqual(testRequest.request?.method, "POST")
+    XCTAssertEqual(testRequest.request?.method, "GET")
   }
 
   func testRequestAssignsClientRequestHeaders() {

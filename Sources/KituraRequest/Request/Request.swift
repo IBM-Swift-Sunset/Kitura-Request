@@ -23,11 +23,25 @@ import LoggerAPI
 /// TODO: Make an asynchronus version
 public class Request {
 
+    /// Generated request
     private(set) var request: ClientRequest?
+
+    /// Generated response on request
     private(set) var response: ClientResponse?
+
+    /// Request's response data
     private(set) var data: NSData?
+
+    /// Request error
     private(set) var error: Swift.Error?
 
+    /// Initializes new `Request` class.
+    ///
+    /// - Parameter method: request method.
+    /// - Parameter URL: request url string.
+    /// - Parameter parameters: parameters that will be send with request.
+    /// - Parameter encoding: encoding that will be used.
+    /// - Parameter headers: additional header.
     public init(method: Method,
              _ URL: String,
              parameters: Parameters? = nil,
@@ -40,6 +54,7 @@ public class Request {
             options.append(.method(method.rawValue)) // set method of request
 
             var urlRequest = try formatURL(URL)
+            urlRequest.httpMethod = method.rawValue
 
             try encoding.encode(&urlRequest, parameters: parameters)
 
@@ -70,6 +85,9 @@ public class Request {
         }
     }
 
+    /// Set a response callback
+    ///
+    /// - Parameter completionHandler: callback to be called when request finishes.
     public func response(_ completionHandler: @escaping CompletionHandler) {
         guard let response = response else {
             completionHandler(request, nil, nil, error)
@@ -85,6 +103,7 @@ public class Request {
         }
     }
 
+    /// Perform a request
     func submit() {
         request?.end()
     }
@@ -92,12 +111,12 @@ public class Request {
 
 extension Request {
 
-    fileprivate func formatURL(_ url: String) throws -> NSMutableURLRequest {
-      // Regex to test validity of url:
-      // _^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS
-      // also check RFC 1808
-
-      // or use NSURL:
+    /// Check string url for errors and generate URLRequest
+    ///
+    /// - Parameter url: url string.
+    ///
+    /// - Returns: a request to given url.
+    fileprivate func formatURL(_ url: String) throws -> URLRequest {
       guard let validURL = URL(string: url) else {
         throw KituraRequest.Error.urlFormat(.invalidURL)
       }
@@ -110,6 +129,6 @@ extension Request {
         throw KituraRequest.Error.urlFormat(.noHostProvided)
       }
 
-      return NSMutableURLRequest(url: validURL)
+      return URLRequest(url: validURL)
     }
 }

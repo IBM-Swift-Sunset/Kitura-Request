@@ -16,5 +16,6 @@
 
 extension Request {
 
+    /// A type of parameters that used for encoding
     public typealias Parameters = [String : Any]
 }

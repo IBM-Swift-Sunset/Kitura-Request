@@ -17,14 +17,24 @@
 
 import Foundation
 
+/// Multipart encoder.
 public struct MultipartEncoding: Encoding {
 
+    /// Body parts array.
     private var bodyParts: [BodyPart]?
+
+    /// Initialize new encoder for specified body parts.
+    ///
+    /// - Parameter bodyParts: body parts that will be encoded alogside request parameters.
     public init(_ bodyParts: [BodyPart]?) {
         self.bodyParts = bodyParts
     }
 
-    public func encode(_ request: inout NSMutableURLRequest, parameters: Request.Parameters?) throws {
+    /// Encode parameters as multipart/form-data
+    ///
+    /// - Parameter request: URL request used in encoding.
+    /// - Parameter parameters: parameters of the request.
+    public func encode(_ request: inout URLRequest, parameters: Request.Parameters?) throws {
         let bodyData = try self.body(for: parameters)
 
         if let httpBody = bodyData.0 {
@@ -38,6 +48,11 @@ public struct MultipartEncoding: Encoding {
         }
     }
 
+    /// Parses parameters for multipart/form-data
+    ///
+    /// - Parameter parameters: parameters of the request.
+    ///
+    /// - Returns: a http body and boundary value.
     private func body(for parameters: Request.Parameters?) throws -> (Data?, String?) {
         var requestBodyParts = [BodyPart]()
 

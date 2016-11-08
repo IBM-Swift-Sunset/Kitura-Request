@@ -33,7 +33,7 @@ API of KituraRequest should feel familiar as it closely maps the one of [Alamofi
 To create a request object simply call
 
 ```swift
-KituraRequest.request(.get, "https://httpbin.org/get"]
+KituraRequest.request(.get, "https://httpbin.org/get")
 ```
 
 #### Request parameters and parameters encoding

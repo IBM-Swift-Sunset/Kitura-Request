@@ -17,32 +17,43 @@
 import Foundation
 
 extension String {
+
+    /// Boundary new line string.
     static let newLine = "\r\n"
 }
 
+/// Boundary struct for body parts separation.
 public struct BodyBoundary {
 
+    /// Boundary unique value.
     private(set) var value: String
 
+    /// Initializes new boundary with predefined unique value.
     init() {
         let boundaryString = String(format: "kitura-request.boundary.%08x%08x", randomize(), randomize())
         self.init(boundaryString)
     }
 
+    /// Initializes new boundary with specified unique value.
+    ///
+    /// - Parameter value: boundary unique value.
     init(_ value: String) {
         self.value = value
     }
 
+    /// Boundary value that starts form-data.
     public var initial: Data? {
         let boundary = "--\(self.value)\(String.newLine)"
         return boundary.data(using: .utf8, allowLossyConversion: false)
     }
 
+    /// Boundary value that separates form-data items.
     public var encapsulated: Data? {
         let boundary = "\(String.newLine)--\(self.value)\(String.newLine)"
         return boundary.data(using: .utf8, allowLossyConversion: false)
     }
 
+    /// Boundary value that finishes form-data.
     public var final: Data? {
         let boundary = "\(String.newLine)--\(self.value)--\(String.newLine)"
         return boundary.data(using: .utf8, allowLossyConversion: false)
