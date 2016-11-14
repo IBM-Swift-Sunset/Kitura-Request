@@ -18,7 +18,7 @@ TODO:
 
 
 ## Installation
-To install KituraRequest add following line to Dependencies in `Package.json`:
+To install KituraRequest add following line to Dependencies in `Package.swift`:
 
 ```swift
 .Package(url: "https://github.com/IBM-Swift/Kitura-Request.git", majorVersion: 0)
