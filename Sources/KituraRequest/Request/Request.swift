@@ -91,6 +91,7 @@ public class Request {
     public func response(_ completionHandler: @escaping CompletionHandler) {
         guard let response = response else {
             completionHandler(request, nil, nil, error)
+            request = nil
             return
         }
 
@@ -98,6 +99,7 @@ public class Request {
         do {
             _ = try response.read(into: &data)
             completionHandler(request, response, data, error)
+            request = nil
         } catch {
             Log.error("Error in Kirutra-Request response: \(error)")
         }
