@@ -64,8 +64,8 @@ class RequestTests: XCTestCase {
                             return
                         }
 
-                        XCTAssertTrue(string.contains("\"file\": \"data:image/png;base64,"), "file should exits in request")
-                        XCTAssertTrue(string.contains("\"key\": \"value\""), "key value should exits in request")
+                        XCTAssertTrue(string.contains("\"file\": \"data:image/png;base64,"), "file should exit in response. Response was `\(string)`")
+                        XCTAssertTrue(string.contains("\"key\": \"value\""), "key value should exit in response. Response was `\(string)`")
                 }
             }
     }
