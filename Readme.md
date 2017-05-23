@@ -1,4 +1,4 @@
-KituraRequest
+Kitura Request
 -------------
 
 **Warning: This is work in progress**
