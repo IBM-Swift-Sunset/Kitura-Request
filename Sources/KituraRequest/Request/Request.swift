@@ -42,11 +42,14 @@ public class Request {
     /// - Parameter parameters: parameters that will be send with request.
     /// - Parameter encoding: encoding that will be used.
     /// - Parameter headers: additional header.
+    /// - Parameter disableSSLVerification: flag to disable verification of the SSL credentials of
+    ///   the remote server
     public init(method: Method,
              _ URL: String,
              parameters: Parameters? = nil,
              encoding: Encoding = URLEncoding.default,
-             headers: [String: String]? = nil) {
+             headers: [String: String]? = nil,
+             disableSSLVerification: Bool = false) {
 
         do {
             var options: [ClientRequest.Options] = []
@@ -67,6 +70,10 @@ public class Request {
 
             if let headers = urlRequest.allHTTPHeaderFields {
                 options.append(.headers(headers))
+            }
+
+            if disableSSLVerification {
+                options.append(.disableSSLVerification)
             }
 
             // Create request
