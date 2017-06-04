@@ -26,16 +26,20 @@ public class KituraRequest {
     /// - Parameter parameters: parameters that will be send with request.
     /// - Parameter encoding: encoding that will be used.
     /// - Parameter headers: additional header.
+    /// - Parameter disableSSLVerification: flag to disable verification of the SSL credentials of
+    ///   the remote server
     public static func request(_ method: Request.Method,
                             _ URL: String,
                             parameters: Request.Parameters? = nil,
                             encoding: Encoding = URLEncoding.default,
-                            headers: [String: String]? = nil) -> Request {
+                            headers: [String: String]? = nil,
+                            disableSSLVerification: Bool = false) -> Request {
         let request =  Request(method: method,
                             URL,
                             parameters: parameters,
                             encoding: encoding,
-                            headers: headers)
+                            headers: headers,
+                            disableSSLVerification: disableSSLVerification)
         request.submit()
         return request
     }
