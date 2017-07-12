@@ -91,7 +91,7 @@ public struct URLEncoding: Encoding {
             return true
         case (.httpBody, _):
             return false
-        case (_, "GET"), (_, "HEAD"):
+        case (_, "GET"), (_, "HEAD"), (_, "DELETE"):
             return true
         default:
             return false
