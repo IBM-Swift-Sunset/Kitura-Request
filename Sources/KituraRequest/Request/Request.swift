@@ -63,12 +63,13 @@ public class Request {
 
             options.append(.hostname(urlRequest.url!.absoluteString))
 
-            // headers
-            if let headers = headers {
+            // headers (defaults)
+            if let headers = urlRequest.allHTTPHeaderFields {
                 options.append(.headers(headers))
             }
-
-            if let headers = urlRequest.allHTTPHeaderFields {
+            
+            // headers (custom)
+            if let headers = headers {
                 options.append(.headers(headers))
             }
 
