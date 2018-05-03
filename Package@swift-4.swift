@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "KituraRequest", targets: ["KituraRequest"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/Kitura-net.git", .upToNextMinor(from: "2.0.0")),
+        .package(url: "https://github.com/IBM-Swift/Kitura-net.git", from: "2.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target defines a module or a test suite.
